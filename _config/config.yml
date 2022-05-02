@@ -1,0 +1,32 @@
+---
+Name: fromholdio-elemental-base
+After: elemental
+---
+
+SilverStripe\Core\Injector\Injector:
+  DNADesign\Elemental\Extensions\ElementalContentControllerExtension:
+    class: SVP\Web\Core\EmptyExtension
+  DNADesign\Elemental\Forms\EditFormFactory:
+    class: Fromholdio\Elemental\Base\Forms\BetterEditFormFactory
+  DNADesign\Elemental\Controllers\ElementController:
+    class: Fromholdio\Elemental\Base\Controllers\BetterElementController
+  DNADesign\Elemental\Extensions\GridFieldDetailFormItemRequestExtension:
+    class: Fromholdio\Elemental\Base\Extensions\GridFieldDetailFormItemRequestExtension
+
+SilverStripe\CMS\Controllers\ContentController:
+  extensions:
+    fioElementalBaseContentController: Fromholdio\Elemental\Base\Extensions\ElementalContentControllerExtension
+  url_handlers:
+    'element/$ID!': 404
+
+Page:
+  extensions:
+    fioElementalBaseAreasContainer: Fromholdio\Elemental\Base\Extensions\ElementalAreasContainer
+
+SilverStripe\SiteConfig\SiteConfig:
+  extensions:
+    fioElementalBaseAreasContainer: Fromholdio\Elemental\Base\Extensions\ElementalAreasContainer
+
+DNADesign\Elemental\Models\BaseElement:
+  extensions:
+    fioElementalBaseElement: Fromholdio\Elemental\Base\Extensions\BaseElementExtension

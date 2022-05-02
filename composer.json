@@ -1,0 +1,29 @@
+{
+  "name": "fromholdio/silverstripe-elemental-base",
+  "type": "silverstripe-vendormodule",
+  "description": "",
+  "license": "BSD-3-Clause",
+  "keywords": ["silverstripe"],
+  "homepage": "https://github.com/fromholdio/silverstripe-elemental-base",
+  "support": {
+    "issues": "https://github.com/fromholdio/silverstripe-elemental-base/issues"
+  },
+  "authors": [{
+    "name": "Luke Fromhold",
+    "homepage": "https://fromhold.io"
+  }],
+  "require": {
+    "silverstripe/vendor-plugin": "^1.0",
+    "dnadesign/silverstripe-elemental": "^4.8.2",
+    "lekoala/silverstripe-cms-actions": "dev-master",
+    "fromholdio/silverstripe-cms-fields-placement": "dev-master",
+    "fromholdio/silverstripe-checkboxfieldgroup": "dev-master"
+  },
+  "autoload": {
+    "psr-4": {
+      "Fromholdio\\Elemental\\Base\\": "src/"
+    }
+  },
+  "prefer-stable": true,
+  "minimum-stability": "dev"
+}
