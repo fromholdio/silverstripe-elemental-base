@@ -14,10 +14,10 @@
   }],
   "require": {
     "silverstripe/vendor-plugin": "^1.0",
-    "dnadesign/silverstripe-elemental": "^4.8.2",
-    "lekoala/silverstripe-cms-actions": "dev-master",
+    "fromholdio/bundle-elemental-forms": "dev-master",
     "fromholdio/silverstripe-cms-fields-placement": "dev-master",
-    "fromholdio/silverstripe-checkboxfieldgroup": "dev-master"
+    "fromholdio/silverstripe-checkboxfieldgroup": "dev-master",
+    "lekoala/silverstripe-cms-actions": "dev-master"
   },
   "autoload": {
     "psr-4": {
