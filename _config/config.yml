@@ -5,7 +5,7 @@ After: elemental
 
 SilverStripe\Core\Injector\Injector:
   DNADesign\Elemental\Extensions\ElementalContentControllerExtension:
-    class: SVP\Web\Core\EmptyExtension
+    class: Fromholdio\EmptyExtension\EmptyExtension
   DNADesign\Elemental\Forms\EditFormFactory:
     class: Fromholdio\Elemental\Base\Forms\BetterEditFormFactory
   DNADesign\Elemental\Controllers\ElementController:
