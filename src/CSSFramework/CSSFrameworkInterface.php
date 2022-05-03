@@ -7,11 +7,11 @@ interface CSSFrameworkInterface
     /**
      * @return string
      */
-    public function getColumnClasses();
+    public function getColumnClasses(): string;
 
     /***
      * @param bool $fluid
      * @return mixed
      */
-    public function getContainerClass($fluid);
+    public function getContainerClass(bool $fluid): string;
 }
