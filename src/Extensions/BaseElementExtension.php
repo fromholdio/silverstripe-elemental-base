@@ -97,90 +97,6 @@ class BaseElementExtension extends DataExtension
     ];
 
 
-    /**
-     * Elemental Grid (based on TheWebmen module)
-     * ----------------------------------------------------
-     */
-
-    public function isGridEnabled(): bool
-    {
-        $area = $this->getOwner()->getArea();
-        $isGridAreaEnabled = !is_null($area) && $area->isGridEnabled();
-        $isEnabled = $this->getOwner()->config()->get('is_grid_enabled') && $isGridAreaEnabled;
-        $this->getOwner()->invokeWithExtensions('updateIsGridEnabled', $isEnabled);
-        return $isEnabled;
-    }
-
-    public function getDefaultGridViewport(): string
-    {
-        return 'MD';
-    }
-
-    public function handleDefaultGridSettings(): void
-    {
-        $size = $this->getOwner()->getGridColumnsCount();
-        $viewport = $this->getOwner()->getDefaultGridViewport();
-        $this->getOwner()->setField('Size' . $viewport, $size);
-    }
-
-    public function getGridCSSFramework(): CSSFrameworkInterface
-    {
-        $framework = $this->getOwner()->gridCSSFramework;
-        if (!is_null($framework)) {
-            return $framework;
-        }
-        $framework = new BootstrapCSSFramework($this->getOwner());
-        $this->getOwner()->gridCSSFramework = $framework;
-        return $framework;
-    }
-
-    public function getColumnClasses(): string
-    {
-        return $this->getOwner()->getGridCSSFramework()->getColumnClasses();
-    }
-
-    public function updateGridBlockSchema(&$blockSchema): void
-    {
-        $defaultViewport = $this->getOwner()->getDefaultGridViewport();
-        $blockSchema['grid'] = [
-            'isRow' => !$this->getOwner()->isGridEnabled(),
-            'gridColumns' => $this->getOwner()->getGridColumnsCount(),
-            'column' => [
-                'defaultViewport' => $defaultViewport,
-                'size' => $this->getOwner()->getField('Size' . $defaultViewport) ?? $this->getOwner()->getGridColumnsCount(),
-                'offset' => $this->getOwner()->getField('Offset' . $defaultViewport),
-                'visibility' => $this->getOwner()->getField('Visibility' . $defaultViewport),
-            ],
-        ];
-    }
-
-    public function getColumnSizeOptions($defaultValue = null): array
-    {
-        // Returns an array of all possibile column widths
-        $columns = [];
-        if ($defaultValue) {
-            $columns[0] = $defaultValue;
-        }
-        for ($i = 1; $i < $this->getOwner()->getGridColumnsCount() + 1; $i++) {
-            $columns[$i] = sprintf('%s %u/%u', _t(__CLASS__ . '.COLUMN', 'Column'), $i, $this->getOwner()->getGridColumnsCount());
-        }
-        return $columns;
-    }
-
-    public function getColumnVisibilityOptions(): array
-    {
-        return [
-            'visible' => _t(__CLASS__ . '.VISIBLE', 'Visible'),
-            'hidden' => _t(__CLASS__ . '.HIDDEN', 'Hidden'),
-        ];
-    }
-
-    public function getGridColumnsCount(): int
-    {
-        return $this->getOwner()->config()->get('grid_columns_count');
-    }
-
-
 
     /**
      * TODO: Summaries/Search/something
@@ -740,6 +656,93 @@ class BaseElementExtension extends DataExtension
         $className = ClassInfo::shortName($this->getOwner());
         if ($lowercase) $className = mb_strtolower($className);
         return $className;
+    }
+
+
+    /**
+     * Elemental Grid (based on TheWebmen module)
+     * ----------------------------------------------------
+     */
+
+    public function isGridEnabled(): bool
+    {
+        $area = $this->getOwner()->getArea();
+        $isGridAreaEnabled = !is_null($area) && $area->isGridEnabled();
+        $isEnabled = $this->getOwner()->config()->get('is_grid_enabled') && $isGridAreaEnabled;
+        $this->getOwner()->invokeWithExtensions('updateIsGridEnabled', $isEnabled);
+        return $isEnabled;
+    }
+
+    public function getDefaultGridViewport(): string
+    {
+        return 'MD';
+    }
+
+    public function handleDefaultGridSettings(): void
+    {
+        $size = $this->getOwner()->getGridColumnsCount();
+        $viewport = $this->getOwner()->getDefaultGridViewport();
+        $this->getOwner()->setField('Size' . $viewport, $size);
+    }
+
+    public function getGridCSSFramework(): CSSFrameworkInterface
+    {
+        $framework = $this->getOwner()->gridCSSFramework;
+        if (!is_null($framework)) {
+            return $framework;
+        }
+        $framework = new BootstrapCSSFramework($this->getOwner());
+        $this->getOwner()->gridCSSFramework = $framework;
+        return $framework;
+    }
+
+    public function getColumnClasses(): string
+    {
+        return $this->getOwner()->getGridCSSFramework()->getColumnClasses();
+    }
+
+    public function updateGridBlockSchema(&$blockSchema): void
+    {
+        if (!$this->getOwner()->isBetterElementalConfigured()) {
+            return;
+        }
+        $defaultViewport = $this->getOwner()->getDefaultGridViewport();
+        $blockSchema['grid'] = [
+            'isRow' => !$this->getOwner()->isGridEnabled(),
+            'gridColumns' => $this->getOwner()->getGridColumnsCount(),
+            'column' => [
+                'defaultViewport' => $defaultViewport,
+                'size' => $this->getOwner()->getField('Size' . $defaultViewport) ?? $this->getOwner()->getGridColumnsCount(),
+                'offset' => $this->getOwner()->getField('Offset' . $defaultViewport),
+                'visibility' => $this->getOwner()->getField('Visibility' . $defaultViewport),
+            ],
+        ];
+    }
+
+    public function getColumnSizeOptions($defaultValue = null): array
+    {
+        // Returns an array of all possibile column widths
+        $columns = [];
+        if ($defaultValue) {
+            $columns[0] = $defaultValue;
+        }
+        for ($i = 1; $i < $this->getOwner()->getGridColumnsCount() + 1; $i++) {
+            $columns[$i] = sprintf('%s %u/%u', _t(__CLASS__ . '.COLUMN', 'Column'), $i, $this->getOwner()->getGridColumnsCount());
+        }
+        return $columns;
+    }
+
+    public function getColumnVisibilityOptions(): array
+    {
+        return [
+            'visible' => _t(__CLASS__ . '.VISIBLE', 'Visible'),
+            'hidden' => _t(__CLASS__ . '.HIDDEN', 'Hidden'),
+        ];
+    }
+
+    public function getGridColumnsCount(): int
+    {
+        return $this->getOwner()->config()->get('grid_columns_count');
     }
 
 
