@@ -120,7 +120,7 @@ class BaseElementExtension extends DataExtension
     {
         $size = $this->getOwner()->getGridColumnsCount();
         $viewport = $this->getOwner()->getDefaultGridViewport();
-        $this->setField('Size' . $viewport, $size);
+        $this->getOwner()->setField('Size' . $viewport, $size);
     }
 
     public function getGridCSSFramework(): CSSFrameworkInterface
@@ -337,7 +337,7 @@ class BaseElementExtension extends DataExtension
     public function getLocalAnchor(): ?string
     {
         $anchor = null;
-        $title = $this->getLocalAnchorTitle();
+        $title = $this->getOwner()->getLocalAnchorTitle();
         if (!empty($title)) {
             $filter = URLSegmentFilter::create();
             $anchor = $filter->filter($title);

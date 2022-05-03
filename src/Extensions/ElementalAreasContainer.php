@@ -180,9 +180,9 @@ class ElementalAreasContainer extends DataExtension
 
     public function getElementalAreaElementClassesConfig(string $name): ?array
     {
-        $config = $this->getElementalAreaConfig($name)['elemental_areas'] ?? null;
+        $config = $this->getOwner()->getElementalAreaConfig($name)['elemental_areas'] ?? null;
         if (empty($config)) return null;
-        $uninheritedConfig = $this->getElementalAreaConfig($name, true)['elemental_areas'] ?? null;
+        $uninheritedConfig = $this->getOwner()->getElementalAreaConfig($name, true)['elemental_areas'] ?? null;
         return BetterElementalArea::parseElementClassesConfig($config, $uninheritedConfig);
     }
 
