@@ -1111,8 +1111,8 @@ class BaseElementExtension extends DataExtension
         ]);
 
         if ($this->getOwner()->isGridEnabled() && !$this->getOwner()->isGridRow()) {
-            $scaffoldFields->push(HiddenField::create('SizeMD'));
-            $scaffoldFields->push(HiddenField::create('OffsetMD'));
+            $fields->push(HiddenField::create('SizeMD'));
+            $fields->push(HiddenField::create('OffsetMD'));
         }
 
         if (!$this->getOwner()->isCMSHistoryEnabled()) {
