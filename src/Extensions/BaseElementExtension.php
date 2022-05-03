@@ -64,7 +64,7 @@ class BaseElementExtension extends DataExtension
     private static $displays_title_in_template = false;
     private static $disable_pretty_anchor_name = false;
 
-    private static $is_grid_enabled = false;
+    private static $is_grid_row = false;
     private static $grid_columns_count = 12;
 
     private static $db = [
@@ -666,11 +666,20 @@ class BaseElementExtension extends DataExtension
 
     public function isGridEnabled(): bool
     {
+        if (!$this->getOwner()->isBetterElementalConfigured()) {
+            return false;
+        }
         $area = $this->getOwner()->getArea();
-        $isGridAreaEnabled = !is_null($area) && $area->isGridEnabled();
-        $isEnabled = $this->getOwner()->config()->get('is_grid_enabled') && $isGridAreaEnabled;
+        $isEnabled = !is_null($area) && $area->isGridEnabled();
         $this->getOwner()->invokeWithExtensions('updateIsGridEnabled', $isEnabled);
         return $isEnabled;
+    }
+
+    public function isGridRow(): bool
+    {
+        $isRow = (bool) $this->getOwner()->config()->get('is_grid_row');
+        $this->getOwner()->invokeWithExtensions('updateIsGridRow', $isRow);
+        return $isRow;
     }
 
     public function getDefaultGridViewport(): string
@@ -703,20 +712,6 @@ class BaseElementExtension extends DataExtension
 
     public function updateGridBlockSchema(&$blockSchema): void
     {
-        if (!$this->getOwner()->isBetterElementalConfigured()) {
-            return;
-        }
-        $defaultViewport = $this->getOwner()->getDefaultGridViewport();
-        $blockSchema['grid'] = [
-            'isRow' => !$this->getOwner()->isGridEnabled(),
-            'gridColumns' => $this->getOwner()->getGridColumnsCount(),
-            'column' => [
-                'defaultViewport' => $defaultViewport,
-                'size' => $this->getOwner()->getField('Size' . $defaultViewport) ?? $this->getOwner()->getGridColumnsCount(),
-                'offset' => $this->getOwner()->getField('Offset' . $defaultViewport),
-                'visibility' => $this->getOwner()->getField('Visibility' . $defaultViewport),
-            ],
-        ];
     }
 
     public function getColumnSizeOptions($defaultValue = null): array
@@ -786,7 +781,25 @@ class BaseElementExtension extends DataExtension
         $schema['content'] = $this->getOwner()->getInlineCMSSummary();
         $schema['fileURL'] = $this->getOwner()->getInlineCMSImageURL();
         $schema['fileTitle'] = $this->getOwner()->getInlineCMSImageTitle();
-        $this->getOwner()->updateGridBlockSchema($schema);
+
+        $defaultViewport = $this->getOwner()->getDefaultGridViewport();
+        $isGridEnabled = $this->getOwner()->isGridEnabled();
+        $isGridRow = $this->getOwner()->isGridRow();
+        $gridSize = $isGridEnabled ? $this->getOwner()->getField('Size' . $defaultViewport) : null;
+        if (empty($gridSize)) $gridSize = $this->getOwner()->getGridColumnsCount();
+        $gridOffset = $isGridEnabled ? $this->getOwner()->getField('Offset' . $defaultViewport) : null;
+        $gridVisibility = $isGridEnabled ? $this->getOwner()->getField('Visibility' . $defaultViewport) : null;
+        $schema['grid'] = [
+            'isEnabled' => $isGridEnabled,
+            'isRow' => !$isGridEnabled || $isGridRow,
+            'gridColumns' => $this->getOwner()->getGridColumnsCount(),
+            'column' => [
+                'defaultViewport' => $defaultViewport,
+                'size' => $gridSize,
+                'offset' => $gridOffset,
+                'visibility' => $gridVisibility,
+            ],
+        ];
     }
 
     public function getCMSTitle(): string
@@ -908,8 +921,10 @@ class BaseElementExtension extends DataExtension
             'VisibilityXL'
         ]);
 
-        $scaffoldFields->push(HiddenField::create('SizeMD'));
-        $scaffoldFields->push(HiddenField::create('OffsetMD'));
+        if ($this->getOwner()->isGridEnabled() && !$this->getOwner()->isGridRow()) {
+            $scaffoldFields->push(HiddenField::create('SizeMD'));
+            $scaffoldFields->push(HiddenField::create('OffsetMD'));
+        }
 
         $htmlTextRows = (int) EditFormFactory::config()->get('html_field_rows');
         if ($htmlTextRows < 1) {
@@ -1095,8 +1110,10 @@ class BaseElementExtension extends DataExtension
             'VisibilityXL'
         ]);
 
-        $fields->push(HiddenField::create('SizeMD'));
-        $fields->push(HiddenField::create('OffsetMD'));
+        if ($this->getOwner()->isGridEnabled() && !$this->getOwner()->isGridRow()) {
+            $scaffoldFields->push(HiddenField::create('SizeMD'));
+            $scaffoldFields->push(HiddenField::create('OffsetMD'));
+        }
 
         if (!$this->getOwner()->isCMSHistoryEnabled()) {
             $fields->removeByName('History');

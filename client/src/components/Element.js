@@ -86,6 +86,7 @@ class Element extends Component {
     return {
       [`col-lg-${this.state.size}`]: true,
       [`offset-lg-${this.state.offset}`]: true,
+      'is-grid-enabled': element.blockSchema.grid.isGridEnabled === true,
       'is-row': element.blockSchema.grid.isRow === true,
       [`is-dragged-top`]: this.props.isDraggedOver && this.props.isDraggedOverPosition === 'top',
       ['is-dragged-bottom']: this.props.isDraggedOver && this.props.isDraggedOverPosition === 'bottom'

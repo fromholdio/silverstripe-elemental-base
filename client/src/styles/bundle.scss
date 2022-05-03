@@ -1,5 +1,5 @@
 // Core variables
-@import "../../vendor/silverstripe/admin/client/src/styles/variables";
+@import "../../../../../../vendor/silverstripe/admin/client/src/styles/variables";
 
 .element-editor__element {
   outline: 1px solid $border-color-light;
@@ -19,7 +19,7 @@
     opacity: 0;
   }
 
-  &.is-row {
+  &.is-grid-enabled.is-row {
     display: block;
     width: 100%;
     max-width: none;
@@ -28,9 +28,9 @@
     background: $body-bg-dark;
     padding: 1.5rem 1.5385rem;
 
-    .element-editor-summary {
-      display: none;
-    }
+    //.element-editor-summary {
+    //  display: none;
+    //}
   }
 }
 
