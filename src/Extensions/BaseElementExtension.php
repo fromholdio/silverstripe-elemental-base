@@ -6,6 +6,7 @@ use DNADesign\Elemental\Controllers\ElementalAreaController;
 use DNADesign\Elemental\Forms\EditFormFactory;
 use DNADesign\Elemental\Models\BaseElement;
 use Fromholdio\CheckboxFieldGroup\CheckboxFieldGroup;
+use Fromholdio\Elemental\Base\Model\BetterBaseElement;
 use SilverStripe\Admin\LeftAndMain;
 use SilverStripe\Assets\Image;
 use SilverStripe\CMS\Model\SiteTree;
@@ -13,6 +14,7 @@ use SilverStripe\Control\Controller;
 use SilverStripe\Core\ClassInfo;
 use SilverStripe\Forms\FieldList;
 use SilverStripe\Forms\FormField;
+use SilverStripe\Forms\HiddenField;
 use SilverStripe\Forms\HTMLEditor\HTMLEditorField;
 use SilverStripe\Forms\LiteralField;
 use SilverStripe\Forms\Tab;
@@ -31,6 +33,8 @@ use SilverStripe\View\Parsers\URLSegmentFilter;
 use Fromholdio\Elemental\Base\BetterElementTrait;
 use Fromholdio\Elemental\Base\Controllers\BetterElementController;
 use Fromholdio\Elemental\Base\Model\BetterElementalArea;
+use Fromholdio\Elemental\Base\CSSFramework\BootstrapCSSFramework;
+use Fromholdio\Elemental\Base\CSSFramework\CSSFrameworkInterface;
 
 /**
  * @mixin BetterElementTrait
@@ -60,10 +64,29 @@ class BaseElementExtension extends DataExtension
     private static $displays_title_in_template = false;
     private static $disable_pretty_anchor_name = false;
 
+    private static $is_grid_enabled = false;
+    private static $grid_columns_count = 12;
+
     private static $db = [
         'CMSName' => 'Varchar',
         'AnchorName' => 'Varchar',
-        'ShowInMenus' => 'Boolean'
+        'ShowInMenus' => 'Boolean',
+
+        'SizeXS' => 'Int',
+        'SizeSM' => 'Int',
+        'SizeMD' => 'Int',
+        'SizeLG' => 'Int',
+        'SizeXL' => 'Int',
+        'OffsetXS' => 'Int',
+        'OffsetSM' => 'Int',
+        'OffsetMD' => 'Int',
+        'OffsetLG' => 'Int',
+        'OffsetXL' => 'Int',
+        'VisibilityXS' => 'Varchar(10)',
+        'VisibilitySM' => 'Varchar(10)',
+        'VisibilityMD' => 'Varchar(10)',
+        'VisibilityLG' => 'Varchar(10)',
+        'VisibilityXL' => 'Varchar(10)',
     ];
 
     private static $field_labels = [
@@ -72,6 +95,91 @@ class BaseElementExtension extends DataExtension
         'AnchorName' => 'Anchor',
         'AdvancedEditButton' => 'Advanced edit'
     ];
+
+
+    /**
+     * Elemental Grid (based on TheWebmen module)
+     * ----------------------------------------------------
+     */
+
+    public function isGridEnabled(): bool
+    {
+        $area = $this->getOwner()->getArea();
+        $isGridAreaEnabled = !is_null($area) && $area->isGridEnabled();
+        $isEnabled = $this->getOwner()->config()->get('is_grid_enabled') && $isGridAreaEnabled;
+        $this->getOwner()->invokeWithExtensions('updateIsGridEnabled', $isEnabled);
+        return $isEnabled;
+    }
+
+    public function getDefaultGridViewport(): string
+    {
+        return 'MD';
+    }
+
+    public function handleDefaultGridSettings(): void
+    {
+        $size = $this->getOwner()->getGridColumnsCount();
+        $viewport = $this->getOwner()->getDefaultGridViewport();
+        $this->setField('Size' . $viewport, $size);
+    }
+
+    public function getGridCSSFramework(): CSSFrameworkInterface
+    {
+        $framework = $this->getOwner()->gridCSSFramework;
+        if (!is_null($framework)) {
+            return $framework;
+        }
+        $framework = new BootstrapCSSFramework($this->getOwner());
+        $this->getOwner()->gridCSSFramework = $framework;
+        return $framework;
+    }
+
+    public function getColumnClasses(): string
+    {
+        return $this->getOwner()->getGridCSSFramework()->getColumnClasses();
+    }
+
+    public function updateGridBlockSchema(&$blockSchema): void
+    {
+        $defaultViewport = $this->getOwner()->getDefaultGridViewport();
+        $blockSchema['grid'] = [
+            'isRow' => !$this->getOwner()->isGridEnabled(),
+            'gridColumns' => $this->getOwner()->getGridColumnsCount(),
+            'column' => [
+                'defaultViewport' => $defaultViewport,
+                'size' => $this->getOwner()->getField('Size' . $defaultViewport) ?? $this->getOwner()->getGridColumnsCount(),
+                'offset' => $this->getOwner()->getField('Offset' . $defaultViewport),
+                'visibility' => $this->getOwner()->getField('Visibility' . $defaultViewport),
+            ],
+        ];
+    }
+
+    public function getColumnSizeOptions($defaultValue = null): array
+    {
+        // Returns an array of all possibile column widths
+        $columns = [];
+        if ($defaultValue) {
+            $columns[0] = $defaultValue;
+        }
+        for ($i = 1; $i < $this->getOwner()->getGridColumnsCount() + 1; $i++) {
+            $columns[$i] = sprintf('%s %u/%u', _t(__CLASS__ . '.COLUMN', 'Column'), $i, $this->getOwner()->getGridColumnsCount());
+        }
+        return $columns;
+    }
+
+    public function getColumnVisibilityOptions(): array
+    {
+        return [
+            'visible' => _t(__CLASS__ . '.VISIBLE', 'Visible'),
+            'hidden' => _t(__CLASS__ . '.HIDDEN', 'Hidden'),
+        ];
+    }
+
+    public function getGridColumnsCount(): int
+    {
+        return $this->getOwner()->config()->get('grid_columns_count');
+    }
+
 
 
     /**
@@ -640,6 +748,11 @@ class BaseElementExtension extends DataExtension
      * ----------------------------------------------------
      */
 
+    public function populateDefaults()
+    {
+        $this->getOwner()->handleDefaultGridSettings();
+    }
+
     public function onBeforeWrite(): void
     {
         $this->getOwner()->enforceTitleSettings();
@@ -667,10 +780,10 @@ class BaseElementExtension extends DataExtension
 
     public function updateBlockSchema(array &$schema): void
     {
-        $schema['content'] = $this->getOwner()->getSummary() . "jalksdjflka\nasdfj\r\nfkasdjfalsf"
-            . '<a href="https://google.com">click me</a>';
-        $schema['fileURL'] = 'https://svp.fromhold.dev/assets/12monkeys.png';
-        $schema['fileTitle'] = '';
+        $schema['content'] = $this->getOwner()->getInlineCMSSummary();
+        $schema['fileURL'] = $this->getOwner()->getInlineCMSImageURL();
+        $schema['fileTitle'] = $this->getOwner()->getInlineCMSImageTitle();
+        $this->getOwner()->updateGridBlockSchema($schema);
     }
 
     public function getCMSTitle(): string
@@ -755,7 +868,8 @@ class BaseElementExtension extends DataExtension
             )
         );
 
-        $scaffoldFields = $this->getOwner()->scaffoldFormFields([
+        $baseInstance = BetterBaseElement::singleton();
+        $scaffoldFields = $baseInstance->scaffoldFormFields([
             'tabbed' => false,
             'includeRelations' => false,
             'restrictFields' => false,
@@ -772,8 +886,27 @@ class BaseElementExtension extends DataExtension
             'Style',
             'Version',
             'CMSName',
-            'ParentID'
+            'ParentID',
+
+            'SizeXS',
+            'SizeSM',
+            'SizeMD',
+            'SizeLG',
+            'SizeXL',
+            'OffsetXS',
+            'OffsetSM',
+            'OffsetMD',
+            'OffsetLG',
+            'OffsetXL',
+            'VisibilityXS',
+            'VisibilitySM',
+            'VisibilityMD',
+            'VisibilityLG',
+            'VisibilityXL'
         ]);
+
+        $scaffoldFields->push(HiddenField::create('SizeMD'));
+        $scaffoldFields->push(HiddenField::create('OffsetMD'));
 
         $htmlTextRows = (int) EditFormFactory::config()->get('html_field_rows');
         if ($htmlTextRows < 1) {
@@ -800,6 +933,11 @@ class BaseElementExtension extends DataExtension
 
         $settingsTab = $fields->findOrMakeTab('Root.Settings');
 
+        if (!$this->isTitleEnabled()) {
+            $nameField = $this->getOwner()->getNameField();
+            $settingsTab->push($nameField);
+        }
+
         if ($this->getOwner()->isAnchorsEnabled())
         {
             $anchorField = $this->getOwner()->getAnchorNameField();
@@ -812,11 +950,6 @@ class BaseElementExtension extends DataExtension
             $settingsTab->push($isMenuField);
         }
 
-        if (!$this->isTitleEnabled()) {
-            $nameField = $this->getOwner()->getNameField();
-            $settingsTab->push($nameField);
-        }
-
         $this->getOwner()->invokeWithExtensions('updateInlineCMSFields', $fields);
 
         if ($this->getOwner()->isAdvancedEditEnabled())
@@ -827,10 +960,10 @@ class BaseElementExtension extends DataExtension
             if ($firstTab)
             {
                 $firstTabFields = $firstTab->Fields();
-                $advButton = $this->getOwner()->getAdvancedEditButtonField();
-                if (!is_null($advButton)) {
-                    $firstTabFields->unshift($advButton);
-                }
+//                $advButton = $this->getOwner()->getAdvancedEditButtonField();
+//                if (!is_null($advButton)) {
+//                    $firstTabFields->unshift($advButton);
+//                }
                 $advMessage = $this->getOwner()->getAdvancedEditMessageField();
                 if (!is_null($advMessage)) {
                     $firstTabFields->push($advMessage);
@@ -940,8 +1073,27 @@ class BaseElementExtension extends DataExtension
             'Style',
             'Version',
             'CMSName',
-            'ParentID'
+            'ParentID',
+
+            'SizeXS',
+            'SizeSM',
+            'SizeMD',
+            'SizeLG',
+            'SizeXL',
+            'OffsetXS',
+            'OffsetSM',
+            'OffsetMD',
+            'OffsetLG',
+            'OffsetXL',
+            'VisibilityXS',
+            'VisibilitySM',
+            'VisibilityMD',
+            'VisibilityLG',
+            'VisibilityXL'
         ]);
+
+        $fields->push(HiddenField::create('SizeMD'));
+        $fields->push(HiddenField::create('OffsetMD'));
 
         if (!$this->getOwner()->isCMSHistoryEnabled()) {
             $fields->removeByName('History');
@@ -955,6 +1107,10 @@ class BaseElementExtension extends DataExtension
         }
 
         $settingsTab = $fields->findOrMakeTab('Root.Settings');
+        if (!$this->isTitleEnabled()) {
+            $nameField = $this->getOwner()->getNameField();
+            $settingsTab->push($nameField);
+        }
         if ($this->getOwner()->isAnchorsEnabled())
         {
             $anchorField = $this->getOwner()->getAnchorNameField();
@@ -964,10 +1120,6 @@ class BaseElementExtension extends DataExtension
         {
             $isMenuField = $this->getOwner()->getMenuVisibilityField();
             $settingsTab->push($isMenuField);
-        }
-        if (!$this->isTitleEnabled()) {
-            $nameField = $this->getOwner()->getNameField();
-            $settingsTab->push($nameField);
         }
     }
 

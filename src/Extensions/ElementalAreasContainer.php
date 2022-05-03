@@ -8,6 +8,7 @@ use LeKoala\CmsActions\CustomAction;
 use SilverStripe\CMS\Model\SiteTree;
 use SilverStripe\Core\Config\Config;
 use SilverStripe\Forms\FieldList;
+use SilverStripe\GraphQL\Controller;
 use SilverStripe\ORM\ArrayList;
 use SilverStripe\ORM\DataExtension;
 use SilverStripe\ORM\DataObject;
@@ -32,21 +33,27 @@ class ElementalAreasContainer extends DataExtension
     public function updateCMSActions(FieldList $actions)
     {
         $actions->push(
-            CustomAction::create('doPublishWithAreas', 'Publish with all elements')
+            $action = CustomAction::create('doPublishWithAreas', 'Publish (including all blocks)')
                 ->setShouldRefresh(true)
                 ->addExtraClass('btn-outline-primary')
                 ->removeExtraClass('btn-info')
         );
+        $action->setAttribute('style', 'margin-left:auto;');
     }
 
     public function doPublishWithAreas()
     {
         $this->getOwner()->publishRecursive();
+        $this->getOwner()->doPublishLocalElementalAreas();
+        return true;
+    }
+
+    public function doPublishLocalElementalAreas()
+    {
         $areas = $this->getOwner()->getLocalElementalAreas();
         foreach ($areas as $area) {
             $area->publishRecursive();
         }
-        return true;
     }
 
 

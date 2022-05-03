@@ -37,6 +37,38 @@ class ElementShared extends BetterBaseElement
         return $elements;
     }
 
+    public function getInlineCMSFields(): FieldList
+    {
+        $fields = parent::getInlineCMSFields();
+        $fields->removeByName('SourceAreaID');
+
+        $availableElements = $this->getAvailableElements();
+        if ($availableElements->count() < 1)
+        {
+            $elementField = ReadonlyField::create(
+                'NoSharedElementsField',
+                $this->fieldLabel('SourceElement'),
+                'There are no elements ready for sharing on this site'
+            );
+        }
+        else {
+            $elementSource = [];
+            foreach ($availableElements as $availableElement) {
+                $elementSource[$availableElement->ID] = $availableElement->getName();
+            }
+            $elementField = DropdownField::create(
+                'SourceElementID',
+                $this->fieldLabel('SourceElement'),
+                $elementSource
+            );
+            $elementField->setHasEmptyDefault(true);
+            $elementField->setEmptyString('- Select block -');
+        }
+
+        $fields->addFieldToTab('Root.Main', $elementField);
+        return $fields;
+    }
+
     public function getCMSFields(): FieldList
     {
         $fields = parent::getCMSFields();
@@ -69,7 +101,7 @@ class ElementShared extends BetterBaseElement
         }
 
         $fields->addFieldToTab(
-            'Root.Main',
+            'Root.ContentTabSet.Main',
             $elementField
         );
 

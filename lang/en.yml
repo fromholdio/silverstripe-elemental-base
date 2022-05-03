@@ -1,0 +1,7 @@
+en:
+  Fromholdio\Elemental\Base\Model\ElementRow:
+    PLURALNAME: 'Rows'
+    PLURALS:
+      one: 'A row'
+      other: '{count} rows'
+    SINGULARNAME: 'row'

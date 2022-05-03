@@ -1,13 +1,27 @@
 ---
 Name: fromholdio-elemental-base
-After: elemental
+After:
+  - 'elemental'
 ---
+
+SilverStripe\Core\Manifest\ModuleManifest:
+  module_priority:
+    - fromholdio/silverstripe-elemental-base
+    - dnadesign/silverstripe-elemental
+
+SilverStripe\Admin\LeftAndMain:
+  extra_requirements_javascript:
+    - 'fromholdio/silverstripe-elemental-base:client/dist/js/bundle.js'
+  extra_requirements_css:
+    - 'fromholdio/silverstripe-elemental-base:client/dist/styles/bundle.css'
 
 SilverStripe\Core\Injector\Injector:
   DNADesign\Elemental\Extensions\ElementalContentControllerExtension:
     class: Fromholdio\EmptyExtension\EmptyExtension
   DNADesign\Elemental\Forms\EditFormFactory:
     class: Fromholdio\Elemental\Base\Forms\BetterEditFormFactory
+  DNADesign\Elemental\Services\ElementTabProvider:
+    class: Fromholdio\Elemental\Base\Services\BetterElementTabProvider
   DNADesign\Elemental\Controllers\ElementController:
     class: Fromholdio\Elemental\Base\Controllers\BetterElementController
   DNADesign\Elemental\Extensions\GridFieldDetailFormItemRequestExtension:

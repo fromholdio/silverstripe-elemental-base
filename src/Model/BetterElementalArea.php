@@ -36,6 +36,8 @@ class BetterElementalArea extends ElementalArea
 
     private static $is_anchors_enabled = true;
 
+    private static $is_grid_enabled = false;
+
     private static $has_one = [
         'ParentContainer' => DataObject::class
     ];
@@ -847,6 +849,19 @@ class BetterElementalArea extends ElementalArea
             return $extended;
         }
         return $this->canEdit($member);
+    }
+
+
+    /**
+     * Elemental Grid (based on TheWebmen module)
+     * ----------------------------------------------------
+     */
+
+    public function isGridEnabled(): bool
+    {
+        $isEnabled = (bool) $this->getOwner()->config()->get('is_grid_enabled');
+        $this->getOwner()->invokeWithExtensions('updateIsGridEnabled', $isEnabled);
+        return $isEnabled;
     }
 
 
