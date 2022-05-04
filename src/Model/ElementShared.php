@@ -65,7 +65,7 @@ class ElementShared extends BetterBaseElement
             $elementField->setEmptyString('- Select block -');
         }
 
-        $fields->addFieldToTab('Root.Main', $elementField);
+        $fields->addFieldToTab('Root.Main', $elementField, 'AdvancedEditMessage');
         return $fields;
     }
 

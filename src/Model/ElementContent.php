@@ -11,6 +11,7 @@ class ElementContent extends BetterBaseElement
     private static $singular_name = 'Content';
     private static $plural_name = 'Content';
     private static $description = 'Simple content element';
+    private static $icon = 'font-icon-block-content';
 
     private static $is_title_enabled = false;
     private static $is_title_required = false;

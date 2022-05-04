@@ -43,11 +43,11 @@ class BaseElementExtension extends DataExtension
 {
     private static $controller_class = BetterElementController::class;
 
-    private static $is_title_enabled = true;
+    private static $is_title_enabled = false;
     private static $is_title_required = false;
 
     private static $is_advanced_edit_enabled = true;
-    private static $advanced_edit_instruction;
+    private static $advanced_edit_instruction = 'to edit more settings.';
 
     private static $is_menu_visibility_enabled = true;
     private static $is_menu_visibility_forced = false;
@@ -93,7 +93,9 @@ class BaseElementExtension extends DataExtension
         'Title' => 'Title',
         'CMSName' => 'Name',
         'AnchorName' => 'Anchor',
-        'AdvancedEditButton' => 'Advanced edit'
+        'AdvancedEditButton' => 'Advanced edit',
+        'ShowInMenusGroup' => 'Visibility',
+        'ShowInMenus' => 'Show in on-page navigation'
     ];
 
 

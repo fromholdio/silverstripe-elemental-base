@@ -36,7 +36,7 @@ class BetterElementalArea extends ElementalArea
 
     private static $is_anchors_enabled = true;
 
-    private static $is_grid_enabled = false;
+    private static $is_grid_enabled = true;
 
     private static $has_one = [
         'ParentContainer' => DataObject::class
