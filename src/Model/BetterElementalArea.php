@@ -381,7 +381,8 @@ class BetterElementalArea extends ElementalArea
                 'Pos' => $counter,
                 'EvenOdd' => $counter % 2 ? 'odd' : 'even'
             ];
-            $element->setElementExtraData($data);
+//            TODO: find out why this method was removed and add it back or remove this.
+//            $element->setElementExtraData($data);
             $counter++;
         }
     }
