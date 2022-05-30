@@ -138,8 +138,8 @@ class Header extends Component {
       }
     );
     const blockIconId = `element-icon-${element.id}`;
-    const myLink = 'https://google.com';
-    const myText = 'Here'
+    // const myLink = 'https://google.com';
+    // const myText = 'Here'
 
     const content = (
       <div className={containerClasses}>
@@ -162,7 +162,7 @@ class Header extends Component {
           <h3 className={titleClasses}>{element.title || noTitle}</h3>
         </div>
         {!simple && <div className="element-editor-header__actions">
-          {expandable &&
+          {/*{expandable &&*/
             <div
               role="none"
               onClick={(event) => event.stopPropagation()}
@@ -177,12 +177,12 @@ class Header extends Component {
               />
             </div>
           }
-          <div
-            role="none"
-            onClick={(event) => event.stopPropagation()}
-          >
-            <a href={myLink}>{myText}</a>
-          </div>
+          {/*<div*/}
+          {/*  role="none"*/}
+          {/*  onClick={(event) => event.stopPropagation()}*/}
+          {/*>*/}
+          {/*  <a href={myLink}>{myText}</a>*/}
+          {/*</div>*/}
           <i className={expandCaretClasses} title={expandTitle} />
         </div>}
       </div>

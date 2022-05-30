@@ -458,7 +458,7 @@ class BaseElementExtension extends DataExtension
         else {
             $templates = array_filter($templates);
         }
-        $this->extend('updateHolderTemplates', $templates);
+        $this->getOwner()->extend('updateHolderTemplates', $templates);
         return $templates;
     }
 

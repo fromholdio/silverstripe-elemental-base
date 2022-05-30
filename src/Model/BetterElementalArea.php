@@ -356,7 +356,7 @@ class BetterElementalArea extends ElementalArea
         foreach ($allElements as $element)
         {
             // canView checks Stage, and isElementEmpty
-            if (!$element->canView()) {
+            if ($element->canView()) {
                 $elements->push($element);
             }
         }
