@@ -24,6 +24,11 @@
       "Fromholdio\\Elemental\\Base\\": "src/"
     }
   },
+  "extra": {
+    "expose": [
+      "client/dist"
+    ]
+  },
   "prefer-stable": true,
   "minimum-stability": "dev"
 }
