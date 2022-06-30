@@ -38,7 +38,8 @@ class BetterElementController extends ElementController
             if (!is_null($curr) && $curr->hasMethod('Link')) {
                 $link = Controller::join_links(
                     $curr->Link(),
-                    $segment
+                    $segment,
+                    $action
                 );
             }
         }
