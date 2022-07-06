@@ -1234,9 +1234,7 @@ class BaseElementExtension extends DataExtension
     public function canView($member = null): ?bool
     {
         if (!$this->getOwner()->isAdminCurrController()) {
-            if ($this->getOwner()->isElementEmpty()) {
-                return false;
-            }
+            return !$this->getOwner()->isElementEmpty();
         }
         $hasCMSAccess = Permission::check('CMS_ACCESS', 'any', $member);
         if ($this->getOwner()->isBaseElement()) {
