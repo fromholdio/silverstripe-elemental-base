@@ -154,7 +154,15 @@ class ElementalAreasContainer extends DataExtension
 
     public function onBeforeWrite(): void
     {
-        $this->getOwner()->requireLocalElementalAreas();
+        $this->getOwner()->doRequireLocalElementalAreas = !$this->getOwner()->isInDB();
+    }
+
+    public function onAfterWrite(): void
+    {
+        if ($this->getOwner()->doRequireLocalElementalAreas) {
+            $this->getOwner()->requireLocalElementalAreas();
+            $this->getOwner()->write();
+        }
     }
 
 
