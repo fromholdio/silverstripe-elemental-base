@@ -158,11 +158,21 @@ class BaseElementExtension extends DataExtension
 
     public function getTitleField(): FormField
     {
-        $field = TextField::create('Title', $this->getOwner()->fieldLabel('Title'));
-        $field
+        $textField = TextField::create('Title', $this->getOwner()->fieldLabel('Title'));
+        $textField
             ->setAttribute('placeholder', $this->getOwner()->getDefaultTitle())
             ->setSchemaData(['attributes' => ['placeholder' => $this->getOwner()->getDefaultTitle()]]);
+
+        $field = $textField;
+
+        if ($this->getOwner()->config()->get('displays_title_in_template')) {
+            $field = TextCheckboxGroupField::create()
+                ->setName('Title');
+            $field->FieldList()->replaceField('Title', $textField);
+        }
+
         $this->getOwner()->invokeWithExtensions('updateTitleField', $field);
+
         return $field;
     }
 
