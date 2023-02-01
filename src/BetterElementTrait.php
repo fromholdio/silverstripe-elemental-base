@@ -112,24 +112,13 @@ trait BetterElementTrait
             //  $link = $container->CMSEditLink();
             //}
         }
-        elseif (is_a($container, BaseElement::class, false))
-        {
-            /**
-             * Unclear right now if this is Element-specific or
-             * all other DataObjects too.
-             */
+        else {
             $link = Controller::join_links(
                 $cmsEditLink,
                 'ItemEditForm/field/' . $relationName . '/item/',
                 $id
             );
             $link = preg_replace('/\/item\/([\d]+)\/edit/', '/item/$1', $link);
-        }
-        else {
-            $link = Controller::join_links(
-                $cmsEditLink,
-                'ItemEditForm'
-            );
         }
 
         $this->extend('updateBetterCMSEditLink', $link);
