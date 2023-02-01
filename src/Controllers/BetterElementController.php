@@ -23,6 +23,8 @@ class BetterElementController extends ElementController
     }
 
 
+
+
     /**
      * Links
      * ----------------------------------------------------
@@ -72,5 +74,36 @@ class BetterElementController extends ElementController
         }
         $this->extend('updateAbsoluteLink', $link, $action);
         return $link;
+    }
+
+
+    /**
+     * Variables/helpers intended/available for use on front-end
+     * ----------------------------------------------------
+     */
+
+    public function First(): bool
+    {
+        return $this->getElement()->getExtraData()['First'] ?? false;
+    }
+
+    public function Last(): bool
+    {
+        return $this->getElement()->getExtraData()['Last'] ?? false;
+    }
+
+    public function TotalItems(): int
+    {
+        return $this->getElement()->getExtraData()['TotalItems'] ?? 0;
+    }
+
+    public function Pos(): int
+    {
+        return $this->getElement()->getExtraData()['Pos'] ?? 0;
+    }
+
+    public function EvenOdd(): ?string
+    {
+        return $this->getElement()->getExtraData()['EvenOdd'] ?? null;
     }
 }
