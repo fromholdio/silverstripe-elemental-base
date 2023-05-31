@@ -17,7 +17,7 @@
     "dnadesign/silverstripe-elemental": "^5",
     "fromholdio/silverstripe-checkboxfieldgroup": "^1.1",
     "fromholdio/silverstripe-cms-fields-placement": "^1.1",
-    "lekoala/silverstripe-cms-actions": "^1.1"
+    "lekoala/silverstripe-cms-actions": "^1.4"
   },
   "autoload": {
     "psr-4": {
