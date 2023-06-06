@@ -46,6 +46,9 @@ class BaseElementExtension extends DataExtension
     private static $is_title_enabled = false;
     private static $is_title_required = false;
 
+    private static $is_name_enabled = true;
+    private static $is_name_required = true;
+
     private static $is_advanced_edit_enabled = true;
     private static $advanced_edit_instruction = 'to edit more settings.';
 
@@ -90,8 +93,8 @@ class BaseElementExtension extends DataExtension
     ];
 
     private static $field_labels = [
-        'Title' => 'Title',
-        'CMSName' => 'Name',
+        'Title' => 'Title (publicly visible)',
+        'CMSName' => 'Name (internal)',
         'AnchorName' => 'Anchor',
         'AdvancedEditButton' => 'Advanced edit',
         'ShowInMenusGroup' => 'Visibility',
@@ -151,7 +154,7 @@ class BaseElementExtension extends DataExtension
         return $isRequired;
     }
 
-    public function getDefaultTitle(): string
+    public function getDefaultTitle(): ?string
     {
         return 'Untitled ' . mb_strtolower($this->getOwner()->getType());
     }
@@ -189,19 +192,56 @@ class BaseElementExtension extends DataExtension
      * with using Title field for both scenarios.
      */
 
+    public function isNameEnabled(): bool
+    {
+        $isEnabled = $this->getOwner()->config()->get('is_name_enabled');
+        $this->getOwner()->invokeWithExtensions('updateIsNameEnabled', $isEnabled);
+        return $isEnabled;
+    }
+
+    public function isNameRequired(): bool
+    {
+        $isEnabled = $this->getOwner()->isNameEnabled();
+        if (!$isEnabled) {
+            return false;
+        }
+        $isRequired = $this->getOwner()->config()->get('is_name_required');
+        $this->getOwner()->invokeWithExtensions('updateIsNameRequired', $isRequired);
+        return $isRequired;
+    }
+
     public function getName(): ?string
     {
         $name = $this->getOwner()->getField('CMSName');
         $this->getOwner()->invokeWithExtensions('updateName', $name);
-        if (empty($name)) {
-            $name = 'Unamed ' . mb_strtolower($this->getOwner()->getType());
+        if (empty($name) && $this->getOwner()->isNameRequired()) {
+            $name = $this->getOwner()->getDefaultName();
         }
         return $name;
+    }
+
+    public function getDefaultName(): ?string
+    {
+        return 'Untitled ' . mb_strtolower($this->getOwner()->getType());
     }
 
     public function getNameField(): FormField
     {
         return TextField::create('CMSName', $this->getOwner()->fieldLabel('CMSName'));
+    }
+
+    public function enforceNameSettings(): void
+    {
+        $name = $this->getOwner()->getField('CMSName');
+        if ($this->getOwner()->isNameRequired()) {
+            if (empty($name)) {
+                $name = $this->getOwner()->getDefaultName();
+            }
+        }
+        elseif (!$this->getOwner()->isNameEnabled()) {
+            $name = null;
+        }
+        $this->getOwner()->setField('CMSName', $name);
     }
 
 
@@ -756,6 +796,7 @@ class BaseElementExtension extends DataExtension
     public function onBeforeWrite(): void
     {
         $this->getOwner()->enforceTitleSettings();
+        $this->getOwner()->enforceNameSettings();
         $this->getOwner()->enforceAnchorSettings();
         $this->getOwner()->handleEmptySortValue();
     }
@@ -808,7 +849,7 @@ class BaseElementExtension extends DataExtension
     {
         $title = $this->getOwner()->getLocalTitle();
         if (empty($title)) {
-            $title = $this->getOwner()->isTitleEnabled()
+            $title = $this->getOwner()->isTitleEnabled() && $this->getOwner()->getDefaultTitle()
                 ? $this->getOwner()->getDefaultTitle()
                 : $this->getOwner()->getName();
         }
@@ -1128,11 +1169,12 @@ class BaseElementExtension extends DataExtension
             $mainTab->unshift($titleField);
         }
 
-        $settingsTab = $fields->findOrMakeTab('Root.Settings');
-        if (!$this->isTitleEnabled()) {
+        if ($this->isNameEnabled()) {
             $nameField = $this->getOwner()->getNameField();
-            $settingsTab->push($nameField);
+            $mainTab->unshift($nameField);
         }
+
+        $settingsTab = $fields->findOrMakeTab('Root.Settings');
         if ($this->getOwner()->isAnchorsEnabled())
         {
             $anchorField = $this->getOwner()->getAnchorNameField();
