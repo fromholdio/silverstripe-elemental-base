@@ -515,6 +515,7 @@ class ElementalAreasContainer extends DataExtension
         foreach ($areas as $area)
         {
             $areaName = $area->getName();
+            if (empty($areaName)) continue;
             if (!$this->getOwner()->isElementalAreaEnabled($areaName)) continue;
 
             $cmsFieldsConfig = $this->getOwner()->getElementalAreaConfig($areaName)['cms_fields'] ?? null;
