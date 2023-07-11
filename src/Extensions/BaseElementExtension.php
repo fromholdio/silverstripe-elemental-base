@@ -71,7 +71,7 @@ class BaseElementExtension extends DataExtension
     private static $grid_columns_count = 12;
 
     private static $db = [
-        'CMSName' => 'Varchar',
+        'Name' => 'Varchar',
         'AnchorName' => 'Varchar',
         'ShowInMenus' => 'Boolean',
 
@@ -94,7 +94,7 @@ class BaseElementExtension extends DataExtension
 
     private static $field_labels = [
         'Title' => 'Title (publicly visible)',
-        'CMSName' => 'Name (internal)',
+        'Name' => 'Name (internal)',
         'AnchorName' => 'Anchor',
         'AdvancedEditButton' => 'Advanced edit',
         'ShowInMenusGroup' => 'Visibility',
@@ -156,15 +156,17 @@ class BaseElementExtension extends DataExtension
 
     public function getDefaultTitle(): ?string
     {
-        return 'Untitled ' . mb_strtolower($this->getOwner()->getType());
+        return 'Untitled ' . $this->getOwner()->getType();
     }
 
     public function getTitleField(): FormField
     {
         $field = TextField::create('Title', $this->getOwner()->fieldLabel('Title'));
-        $field
-            ->setAttribute('placeholder', $this->getOwner()->getDefaultTitle())
-            ->setSchemaData(['attributes' => ['placeholder' => $this->getOwner()->getDefaultTitle()]]);
+        if ($this->getOwner()->isTitleRequired()) {
+            $field
+                ->setAttribute('placeholder', $this->getOwner()->getDefaultTitle())
+                ->setSchemaData(['attributes' => ['placeholder' => $this->getOwner()->getDefaultTitle()]]);
+        }
         $this->getOwner()->invokeWithExtensions('updateTitleField', $field);
         return $field;
     }
@@ -192,6 +194,26 @@ class BaseElementExtension extends DataExtension
      * with using Title field for both scenarios.
      */
 
+    public function Name(): ?string
+    {
+        $curr = Controller::curr();
+        return !is_null($curr) && is_a($curr, GraphQLController::class, false)
+            ? $this->getOwner()->getInlineCMSName()
+            : $this->getOwner()->getLocalName();
+    }
+
+    public function getName(): ?string
+    {
+        return $this->Name();
+    }
+
+    public function getLocalName(): ?string
+    {
+        $name = $this->getOwner()->getField('Name');
+        if (empty($name)) $name = null;
+        return $this->getOwner()->isNameEnabled() ? $name : null;
+    }
+
     public function isNameEnabled(): bool
     {
         $isEnabled = $this->getOwner()->config()->get('is_name_enabled');
@@ -210,29 +232,26 @@ class BaseElementExtension extends DataExtension
         return $isRequired;
     }
 
-    public function getName(): ?string
-    {
-        $name = $this->getOwner()->getField('CMSName');
-        $this->getOwner()->invokeWithExtensions('updateName', $name);
-        if (empty($name) && $this->getOwner()->isNameRequired()) {
-            $name = $this->getOwner()->getDefaultName();
-        }
-        return $name;
-    }
-
     public function getDefaultName(): ?string
     {
-        return 'Untitled ' . mb_strtolower($this->getOwner()->getType());
+        return 'Untitled ' . $this->getOwner()->getType();
     }
 
     public function getNameField(): FormField
     {
-        return TextField::create('CMSName', $this->getOwner()->fieldLabel('CMSName'));
+        $field = TextField::create('Name', $this->getOwner()->fieldLabel('Name'));
+        if ($this->getOwner()->isNameRequired()) {
+            $field
+                ->setAttribute('placeholder', $this->getOwner()->getDefaultName())
+                ->setSchemaData(['attributes' => ['placeholder' => $this->getOwner()->getDefaultName()]]);
+        }
+        $this->getOwner()->invokeWithExtensions('updateNameField', $field);
+        return $field;
     }
 
     public function enforceNameSettings(): void
     {
-        $name = $this->getOwner()->getField('CMSName');
+        $name = $this->getOwner()->getField('Name');
         if ($this->getOwner()->isNameRequired()) {
             if (empty($name)) {
                 $name = $this->getOwner()->getDefaultName();
@@ -241,7 +260,7 @@ class BaseElementExtension extends DataExtension
         elseif (!$this->getOwner()->isNameEnabled()) {
             $name = null;
         }
-        $this->getOwner()->setField('CMSName', $name);
+        $this->getOwner()->setField('Name', $name);
     }
 
 
@@ -845,13 +864,28 @@ class BaseElementExtension extends DataExtension
         ];
     }
 
+    public function getCMSName(): string
+    {
+        $name = null;
+        if ($this->getOwner()->isNameEnabled()) {
+            if ($local = $this->getOwner()->getLocalName()) {
+                $name = $local;
+            } elseif ($this->getOwner()->isNameRequired()) {
+                $name = $this->getOwner()->getDefaultName();
+            }
+        }
+        return $name;
+    }
+
     public function getCMSTitle(): string
     {
-        $title = $this->getOwner()->getLocalTitle();
-        if (empty($title)) {
-            $title = $this->getOwner()->isTitleEnabled() && $this->getOwner()->getDefaultTitle()
-                ? $this->getOwner()->getDefaultTitle()
-                : $this->getOwner()->getName();
+        $title = null;
+        if ($this->getOwner()->isTitleEnabled()) {
+            if ($local = $this->getOwner()->getLocalTitle()) {
+                $title = $local;
+            } elseif ($this->getOwner()->isTitleRequired()) {
+                $title = $this->getOwner()->getDefaultTitle();
+            }
         }
         return $title;
     }
@@ -874,15 +908,20 @@ class BaseElementExtension extends DataExtension
     {
         $parts = $this->getOwner()->getInlineCMSTitleParts();
         $parts = array_values(array_filter($parts));
-        return implode("\r\n", $parts);
+        return implode(":\r\n", $parts);
     }
 
     public function getInlineCMSTitleParts(): array
     {
         $parts = [
             'type' => $this->getOwner()->getType(),
-            'title' => $this->getOwner()->getCMSTitle()
         ];
+        if ($name = $this->getOwner()->getCMSName()) {
+            $parts['name'] = $name;
+        }
+        if ($title = $this->getOwner()->getCMSTitle()) {
+            $parts['title'] = $title;
+        }
         $this->getOwner()->invokeWithExtensions('updateInlineCMSTitleParts', $parts);
         return $parts;
     }
