@@ -196,10 +196,7 @@ class BaseElementExtension extends DataExtension
 
     public function Name(): ?string
     {
-        $curr = Controller::curr();
-        return !is_null($curr) && is_a($curr, GraphQLController::class, false)
-            ? $this->getOwner()->getInlineCMSName()
-            : $this->getOwner()->getLocalName();
+        return $this->getOwner()->getLocalName();
     }
 
     public function getName(): ?string
@@ -864,7 +861,7 @@ class BaseElementExtension extends DataExtension
         ];
     }
 
-    public function getCMSName(): string
+    public function getCMSName(): ?string
     {
         $name = null;
         if ($this->getOwner()->isNameEnabled()) {
@@ -877,7 +874,7 @@ class BaseElementExtension extends DataExtension
         return $name;
     }
 
-    public function getCMSTitle(): string
+    public function getCMSTitle(): ?string
     {
         $title = null;
         if ($this->getOwner()->isTitleEnabled()) {
