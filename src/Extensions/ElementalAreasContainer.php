@@ -533,6 +533,11 @@ class ElementalAreasContainer extends DataExtension
         }
     }
 
+    public function updateSiteCMSFields(FieldList $fields): void
+    {
+        $this->updateCMSFields($fields);
+    }
+
 
     /**
      * @return DataObject&ElementalAreasContainer
