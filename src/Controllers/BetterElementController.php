@@ -36,11 +36,10 @@ class BetterElementController extends ElementController
         $element = $this->getElement();
         $segment = $element->getHandlerURLSegment();
         if (!is_null($segment)) {
-            $curr = Controller::curr();
+            $curr = $element->getPage();
             if (!is_null($curr) && $curr->hasMethod('Link')) {
                 $link = Controller::join_links(
-                    $curr->Link(),
-                    $segment,
+                    $curr->Link($segment),
                     $action
                 );
             }
