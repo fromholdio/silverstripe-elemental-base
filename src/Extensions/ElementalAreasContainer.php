@@ -20,13 +20,24 @@ class ElementalAreasContainer extends DataExtension
         'ContainedAreas' => BetterElementalArea::class . '.ParentContainer'
     ];
 
-    private static $cascade_deletes = [
-        'ContainedAreas'
-    ];
-
-    private static $cascade_duplicates = [
-        'ContainedAreas'
-    ];
+    /**
+     * Duplication assumes that you have setup $cascade_duplicates entries for each
+     * of your elemental area relations. If you have not, then you will need to.
+     * i.e. $has_one of 'ContentArea' on Page should be listed in $cascades_duplicates,
+     * so that in the function below ->getLocalElementalAreas() returns the new cloned areas.
+     */
+    public function onAfterDuplicate(DataObject $original, bool $doWrite): void
+    {
+        $newContainerClass = get_class($this->getOwner());
+        $newContainerID = $this->getOwner()->getField('ID');
+        $newAreas = $this->getOwner()->getLocalElementalAreas();
+        foreach ($newAreas as $newArea) {
+            $newArea->setField('ParentContainerID', $newContainerID);
+            $newArea->setField('ParentContainerClass', $newContainerClass);
+            $newArea->write();
+            $newArea->publishSingle();
+        }
+    }
 
 
     public function updateCMSActions(FieldList $actions)
