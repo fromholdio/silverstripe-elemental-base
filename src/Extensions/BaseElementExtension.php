@@ -361,14 +361,16 @@ class BaseElementExtension extends DataExtension
     {
         $anchors = [];
         $fieldNames = $this->getOwner()->getAnchorFieldNames();
-        $fieldTypes = [DBHTMLText::class, DBHTMLVarchar::class];
-        foreach ($fieldNames as $fieldName)
-        {
-            $field = $this->getOwner()->dbObject($fieldName);
-            if (!is_null($field) && in_array(get_class($field), $fieldTypes)) {
-                $fieldAnchors = $field->getAnchors();
-                if (!empty($fieldAnchors)) {
-                    $anchors = [...$anchors, ...array_values($fieldAnchors)];
+        if (!is_null($fieldNames)) {
+            $fieldTypes = [DBHTMLText::class, DBHTMLVarchar::class];
+            foreach ($fieldNames as $fieldName)
+            {
+                $field = $this->getOwner()->dbObject($fieldName);
+                if (!is_null($field) && in_array(get_class($field), $fieldTypes)) {
+                    $fieldAnchors = $field->getAnchors();
+                    if (!empty($fieldAnchors)) {
+                        $anchors = [...$anchors, ...array_values($fieldAnchors)];
+                    }
                 }
             }
         }
