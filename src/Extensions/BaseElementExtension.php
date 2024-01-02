@@ -46,6 +46,9 @@ class BaseElementExtension extends DataExtension
     private static $is_title_enabled = false;
     private static $is_title_required = false;
 
+    private static $is_name_enabled = true;
+    private static $is_name_required = false;
+
     private static $is_advanced_edit_enabled = true;
     private static $advanced_edit_instruction = 'to edit more settings.';
 
@@ -53,7 +56,7 @@ class BaseElementExtension extends DataExtension
     private static $is_menu_visibility_forced = false;
 
     // false for side area, shared elements, for example.
-    private static $is_anchors_enabled = false;
+    private static $is_anchors_enabled = true;
     private static $anchor_field_names = [];
 
     private static $is_cms_history_enabled = false;
@@ -68,7 +71,7 @@ class BaseElementExtension extends DataExtension
     private static $grid_columns_count = 12;
 
     private static $db = [
-        'CMSName' => 'Varchar',
+        'Name' => 'Varchar',
         'AnchorName' => 'Varchar',
         'ShowInMenus' => 'Boolean',
 
@@ -90,8 +93,8 @@ class BaseElementExtension extends DataExtension
     ];
 
     private static $field_labels = [
-        'Title' => 'Title',
-        'CMSName' => 'Name',
+        'Title' => 'Headline',
+        'Name' => 'Name',
         'AnchorName' => 'Anchor',
         'AdvancedEditButton' => 'Advanced edit',
         'ShowInMenusGroup' => 'Visibility',
@@ -153,15 +156,16 @@ class BaseElementExtension extends DataExtension
 
     public function getDefaultTitle(): string
     {
-        return 'Untitled ' . mb_strtolower($this->getOwner()->getType());
+        return 'Untitled ' . $this->getOwner()->getType();
     }
 
     public function getTitleField(): FormField
     {
         $field = TextField::create('Title', $this->getOwner()->fieldLabel('Title'));
-        $field
-            ->setAttribute('placeholder', $this->getOwner()->getDefaultTitle())
-            ->setSchemaData(['attributes' => ['placeholder' => $this->getOwner()->getDefaultTitle()]]);
+        if ($this->getOwner()->isTitleRequired()) {
+            $field->setAttribute('placeholder', $this->getOwner()->getDefaultTitle())
+                ->setSchemaData(['attributes' => ['placeholder' => $this->getOwner()->getDefaultTitle()]]);
+        }
         $this->getOwner()->invokeWithExtensions('updateTitleField', $field);
         return $field;
     }
@@ -189,19 +193,70 @@ class BaseElementExtension extends DataExtension
      * with using Title field for both scenarios.
      */
 
+    public function Name(): ?string
+    {
+        return $this->getOwner()->getLocalName();
+    }
+
     public function getName(): ?string
     {
-        $name = $this->getOwner()->getField('CMSName');
-        $this->getOwner()->invokeWithExtensions('updateName', $name);
-        if (empty($name)) {
-            $name = 'Unamed ' . mb_strtolower($this->getOwner()->getType());
+        return $this->Name();
+    }
+
+    public function getLocalName(): ?string
+    {
+        $name = $this->getOwner()->getField('Name');
+        if (empty($name)) $name = null;
+        return $this->getOwner()->isNameEnabled() ? $name : null;
+    }
+
+    public function isNameEnabled(): bool
+    {
+        $isEnabled = $this->getOwner()->config()->get('is_name_enabled');
+        $this->getOwner()->invokeWithExtensions('updateIsNameEnabled', $isEnabled);
+        return $isEnabled;
+    }
+
+    public function isNameRequired(): bool
+    {
+        $isEnabled = $this->getOwner()->isNameEnabled();
+        if (!$isEnabled) {
+            return false;
         }
-        return $name;
+        $isRequired = $this->getOwner()->config()->get('is_name_required');
+        $this->getOwner()->invokeWithExtensions('updateIsNameRequired', $isRequired);
+        return $isRequired;
+    }
+
+    public function getDefaultName(): string
+    {
+        return 'Unnamed ' . $this->getOwner()->getType();
     }
 
     public function getNameField(): FormField
     {
-        return TextField::create('CMSName', $this->getOwner()->fieldLabel('CMSName'));
+        $field = TextField::create('Name', $this->getOwner()->fieldLabel('Name'));
+        if ($this->getOwner()->isNameRequired()) {
+            $field->setAttribute('placeholderr', $this->getOwner()->getDefaultName())
+                ->setSchemaData(['attributes' => ['placeholder' => $this->getOwner()->getDefaultName()]]);
+        }
+        $field->setDescription('Used in CMS only, never publicly visible');
+        $this->getOwner()->invokeWithExtensions('updateNameField', $field);
+        return $field;
+    }
+
+    public function enforceNameSettings(): void
+    {
+        $name = $this->getOwner()->getField('Name');
+        if ($this->getOwner()->isNameRequired()) {
+            if (empty($name)) {
+                $name = $this->getOwner()->getDefaultName();
+            }
+        }
+        elseif (!$this->getOwner()->isNameEnabled()) {
+            $name = null;
+        }
+        $this->getOwner()->setField('Name', $name);
     }
 
 
@@ -214,7 +269,8 @@ class BaseElementExtension extends DataExtension
 
     public function isAnchorsEnabled(): bool
     {
-        $isEnabled = $this->getOwner()->config()->get('is_anchors_enabled');
+        $isEnabled = $this->getOwner()->getArea()?->isAnchorsEnabled()
+            && $this->getOwner()->config()->get('is_anchors_enabled');
         $this->getOwner()->invokeWithExtensions('updateIsAnchorsEnabled', $isEnabled);
         return $isEnabled;
     }
@@ -307,14 +363,16 @@ class BaseElementExtension extends DataExtension
     {
         $anchors = [];
         $fieldNames = $this->getOwner()->getAnchorFieldNames();
-        $fieldTypes = [DBHTMLText::class, DBHTMLVarchar::class];
-        foreach ($fieldNames as $fieldName)
-        {
-            $field = $this->getOwner()->dbObject($fieldName);
-            if (!is_null($field) && in_array(get_class($field), $fieldTypes)) {
-                $fieldAnchors = $field->getAnchors();
-                if (!empty($fieldAnchors)) {
-                    $anchors = [...$anchors, ...array_values($fieldAnchors)];
+        if (!is_null($fieldNames)) {
+            $fieldTypes = [DBHTMLText::class, DBHTMLVarchar::class];
+            foreach ($fieldNames as $fieldName)
+            {
+                $field = $this->getOwner()->dbObject($fieldName);
+                if (!is_null($field) && in_array(get_class($field), $fieldTypes)) {
+                    $fieldAnchors = $field->getAnchors();
+                    if (!empty($fieldAnchors)) {
+                        $anchors = [...$anchors, ...array_values($fieldAnchors)];
+                    }
                 }
             }
         }
@@ -527,7 +585,9 @@ class BaseElementExtension extends DataExtension
     public function getLocalArea(bool $doUseCache = true): ?BetterElementalArea
     {
         if ($doUseCache) {
-            $area = $this->getOwner()->getCachedLocalArea();
+            $area = $this->getOwner()->hasMethod('getCachedLocalArea')
+                ? $this->getOwner()->getCachedLocalArea()
+                : null;
             if (!is_null($area)) {
                 return $area;
             }
@@ -538,18 +598,26 @@ class BaseElementExtension extends DataExtension
             /** @var BetterElementalArea $area */
             $area = BetterElementalArea::get()->find('ID', $areaID);
         }
-        $this->getOwner()->setCachedLocalArea($area);
+
+        if ($this->getOwner()->hasMethod('setCachedLocalArea')) {
+            $this->getOwner()->setCachedLocalArea($area);
+        }
         return $area;
     }
 
     public function setCurrentArea(?BetterElementalArea $area): BaseElement
     {
-        return $this->getOwner()->setCachedCurrentArea($area);
+        if ($this->getOwner()->hasMethod('setCachedCurrentArea')) {
+            $this->getOwner()->setCachedCurrentArea($area);
+        }
+        return $this->getOwner();
     }
 
     public function getCurrentArea(): ?BetterElementalArea
     {
-        return $this->getOwner()->getCachedCurrentArea();
+        return $this->getOwner()->hasMethod('getCachedCurrentArea')
+            ? $this->getOwner()->getCachedCurrentArea()
+            : null;
     }
 
 
@@ -756,6 +824,7 @@ class BaseElementExtension extends DataExtension
     public function onBeforeWrite(): void
     {
         $this->getOwner()->enforceTitleSettings();
+        $this->getOwner()->enforceNameSettings();
         $this->getOwner()->enforceAnchorSettings();
         $this->getOwner()->handleEmptySortValue();
     }
@@ -804,13 +873,28 @@ class BaseElementExtension extends DataExtension
         ];
     }
 
-    public function getCMSTitle(): string
+    public function getCMSName(): ?string
     {
-        $title = $this->getOwner()->getLocalTitle();
-        if (empty($title)) {
-            $title = $this->getOwner()->isTitleEnabled()
-                ? $this->getOwner()->getDefaultTitle()
-                : $this->getOwner()->getName();
+        $name = null;
+        if ($this->getOwner()->isNameEnabled()) {
+            if ($local = $this->getOwner()->getLocalName()) {
+                $name = $local;
+            } elseif ($this->getOwner()->isNameRequired()) {
+                $name = $this->getOwner()->getDefaultName();
+            }
+        }
+        return $name;
+    }
+
+    public function getCMSTitle(): ?string
+    {
+        $title = null;
+        if ($this->getOwner()->isTitleEnabled()) {
+            if ($local = $this->getOwner()->getLocalTitle()) {
+                $title = $local;
+            } elseif ($this->getOwner()->isTitleRequired()) {
+                $title = $this->getOwner()->getDefaultTitle();
+            }
         }
         return $title;
     }
@@ -833,15 +917,35 @@ class BaseElementExtension extends DataExtension
     {
         $parts = $this->getOwner()->getInlineCMSTitleParts();
         $parts = array_values(array_filter($parts));
-        return implode("\r\n", $parts);
+        return implode(":\r\n", $parts);
     }
 
     public function getInlineCMSTitleParts(): array
     {
         $parts = [
             'type' => $this->getOwner()->getType(),
-            'title' => $this->getOwner()->getCMSTitle()
         ];
+
+        $fallback = $this->getOwner()->getDefaultName();
+
+        if ($this->getOwner()->isNameEnabled()) {
+            $localName = $this->getOwner()->getLocalName();
+            if (!empty($localName) && $localName !== $fallback) {
+                $parts['name'] = $localName;
+            }
+        }
+
+        if ($this->getOwner()->isTitleEnabled()) {
+            $localTitle = $this->getOwner()->getLocalTitle();
+            if (!empty($localTitle) && $localTitle !== $this->getOwner()->getDefaultTitle()) {
+                $parts['title'] = $localTitle;
+            }
+        }
+
+        if (empty($parts['name']) && empty($parts['title'])) {
+            $parts['name'] = $fallback;
+        }
+
         $this->getOwner()->invokeWithExtensions('updateInlineCMSTitleParts', $parts);
         return $parts;
     }
@@ -905,6 +1009,7 @@ class BaseElementExtension extends DataExtension
             'Version',
             'CMSName',
             'ParentID',
+            'ShowInMenusGroup',
 
             'SizeXS',
             'SizeSM',
@@ -1094,6 +1199,7 @@ class BaseElementExtension extends DataExtension
             'Version',
             'CMSName',
             'ParentID',
+            'ShowInMenusGroup',
 
             'SizeXS',
             'SizeSM',
@@ -1129,9 +1235,9 @@ class BaseElementExtension extends DataExtension
         }
 
         $settingsTab = $fields->findOrMakeTab('Root.Settings');
-        if (!$this->isTitleEnabled()) {
+        if ($this->isNameEnabled()) {
             $nameField = $this->getOwner()->getNameField();
-            $settingsTab->push($nameField);
+            $settingsTab->unshift($nameField);
         }
         if ($this->getOwner()->isAnchorsEnabled())
         {
