@@ -162,9 +162,10 @@ class BaseElementExtension extends DataExtension
     public function getTitleField(): FormField
     {
         $field = TextField::create('Title', $this->getOwner()->fieldLabel('Title'));
-        $field
-            ->setAttribute('placeholder', $this->getOwner()->getDefaultTitle())
-            ->setSchemaData(['attributes' => ['placeholder' => $this->getOwner()->getDefaultTitle()]]);
+        if ($this->getOwner()->isTitleRequired()) {
+            $field->setAttribute('placeholder', $this->getOwner()->getDefaultTitle())
+                ->setSchemaData(['attributes' => ['placeholder' => $this->getOwner()->getDefaultTitle()]]);
+        }
         $this->getOwner()->invokeWithExtensions('updateTitleField', $field);
         return $field;
     }
@@ -235,10 +236,11 @@ class BaseElementExtension extends DataExtension
     public function getNameField(): FormField
     {
         $field = TextField::create('Name', $this->getOwner()->fieldLabel('Name'));
-        $field
-            ->setAttribute('placeholder', $this->getOwner()->getDefaultName())
-            ->setSchemaData(['attributes' => ['placeholder' => $this->getOwner()->getDefaultName()]])
-            ->setDescription('Used in CMS only, never publicly visible');
+        if ($this->getOwner()->isNameRequired()) {
+            $field->setAttribute('placeholderr', $this->getOwner()->getDefaultName())
+                ->setSchemaData(['attributes' => ['placeholder' => $this->getOwner()->getDefaultName()]]);
+        }
+        $field->setDescription('Used in CMS only, never publicly visible');
         $this->getOwner()->invokeWithExtensions('updateNameField', $field);
         return $field;
     }
