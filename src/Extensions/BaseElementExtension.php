@@ -704,11 +704,6 @@ class BaseElementExtension extends DataExtension
      * ----------------------------------------------------
      */
 
-    public function populateDefaults()
-    {
-        $this->getOwner()->handleDefaultGridSettings();
-    }
-
     public function onBeforeWrite(): void
     {
         $this->getOwner()->enforceTitleSettings();
