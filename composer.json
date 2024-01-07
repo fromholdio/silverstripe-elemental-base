@@ -1,7 +1,7 @@
 {
   "name": "fromholdio/silverstripe-elemental-base",
   "type": "silverstripe-vendormodule",
-  "description": "",
+  "description": "Base layer to sit on OOTB elemental providing first-class multi-areas and other enhancements",
   "license": "BSD-3-Clause",
   "keywords": ["silverstripe"],
   "homepage": "https://github.com/fromholdio/silverstripe-elemental-base",
