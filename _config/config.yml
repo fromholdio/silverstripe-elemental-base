@@ -13,7 +13,7 @@ SilverStripe\Admin\LeftAndMain:
   extra_requirements_javascript:
     - 'fromholdio/silverstripe-elemental-base:client/dist/js/bundle.js'
   extra_requirements_css:
-    - 'fromholdio/silverstripe-elemental-base:client/dist/styles/bundle.css'
+    - 'fromholdio/silverstripe-elemental-base:client/dist/css/bundle.css'
 
 SilverStripe\Core\Injector\Injector:
   DNADesign\Elemental\Extensions\ElementalContentControllerExtension:
