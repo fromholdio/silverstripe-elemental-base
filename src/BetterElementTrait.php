@@ -303,7 +303,7 @@ trait BetterElementTrait
 
 
     /**
-     * No longer necessary
+     * No longer necessary/relevant
      * ----------------------------------------------------
      */
 

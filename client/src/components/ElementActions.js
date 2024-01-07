@@ -24,12 +24,11 @@ class ElementActions extends Component {
    */
   handleEditTabsClick(event) {
     const { handleEditTabsClick } = this.props;
-     handleEditTabsClick(event.target.name);
+    handleEditTabsClick(event.target.name);
   }
 
   handleEditFormLinkClick(event) {
-    console.log(event.target.getAttribute('data-test'));
-    window.location = event.target.getAttribute('data-test');
+    window.location = event.target.getAttribute('data-edit-form-url');
   }
 
   renderEditFormLink() {
@@ -40,7 +39,7 @@ class ElementActions extends Component {
         key="edit-form-link-name"
         name="edit-form-link-name"
         title="Edit"
-        data-test={ editFormURL }
+        data-edit-form-url={ editFormURL }
         onClick={this.handleEditFormLinkClick}
         active={ false }
       />
@@ -62,9 +61,10 @@ class ElementActions extends Component {
    * @returns {HTMLElement[]|null}
    */
   renderEditTabs() {
-    const { editTabs, activeTab, type } = this.props;
+    const { editTabs, activeTab, type, expandable } = this.props;
 
-    if (!editTabs || !editTabs.length) {
+    // Don't render tabs if the block is not expandable or if no tabs are defined
+    if (type.broken || !expandable || !editTabs || !editTabs.length) {
       return null;
     }
 
@@ -87,12 +87,15 @@ class ElementActions extends Component {
    * @returns {DropdownItem|null}
    */
   renderDivider() {
-    const { children, editTabs } = this.props;
+    const { children, editTabs, expandable } = this.props;
 
-    if (editTabs && editTabs.length && React.Children.count(children)) {
-      return <DropdownItem divider role="separator" />;
+    // Don't render divider if the block is not expandable or if no tabs are defined
+    // or if there's no actions displayed after the tab list
+    if (!expandable || !editTabs || !editTabs.length || React.Children.count(children) === 0) {
+      return null;
     }
-    return null;
+
+    return <DropdownItem divider role="separator" />;
   }
 
   /**
@@ -115,7 +118,7 @@ class ElementActions extends Component {
     return (
       <ActionMenuComponent
         id={`element-editor-actions-${id}`}
-        className={'element-editor-header__actions-dropdown'}
+        className="element-editor-header__actions-dropdown"
         dropdownMenuProps={{ right: true }}
         dropdownToggleClassNames={dropdownToggleClassNames}
       >
@@ -142,10 +145,12 @@ ElementActions.propTypes = {
     name: PropTypes.string,
   })),
   handleEditTabsClick: PropTypes.func.isRequired,
+  expandable: PropTypes.bool
 };
 
 ElementActions.defaultProps = {
   editTabs: [],
+  expandable: true
 };
 
 export { ElementActions as Component };

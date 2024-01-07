@@ -68,12 +68,6 @@ class ElementalAreasContainer extends DataExtension
 
 
     /**
-     * TODO:
-     *  - Summaries/Search/something
-     */
-
-
-    /**
      * Require default records
      * ----------------------------------------------------
      */
