@@ -7,7 +7,7 @@ use SilverStripe\Control\Controller;
 use SilverStripe\ORM\FieldType\DBHTMLText;
 use SilverStripe\View\SSViewer;
 
-class BetterElementController extends ElementController
+class EvoElementController extends ElementController
 {
     /**
      * Templates/Rendering

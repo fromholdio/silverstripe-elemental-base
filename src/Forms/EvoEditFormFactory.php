@@ -5,7 +5,7 @@ namespace Fromholdio\Elemental\Base\Forms;
 use DNADesign\Elemental\Forms\EditFormFactory;
 use SilverStripe\Control\RequestHandler;
 
-class BetterEditFormFactory extends EditFormFactory
+class EvoEditFormFactory extends EditFormFactory
 {
     protected function getFormFields(RequestHandler $controller = null, $name, $context = [])
     {

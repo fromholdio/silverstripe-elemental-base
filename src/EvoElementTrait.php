@@ -8,19 +8,19 @@ use SilverStripe\CMS\Model\SiteTree;
 use SilverStripe\Control\Controller;
 use SilverStripe\Security\Member;
 use SilverStripe\SiteConfig\SiteConfig;
-use Fromholdio\Elemental\Base\Controllers\BetterElementController;
+use Fromholdio\Elemental\Base\Controllers\EvoElementController;
 use Fromholdio\Elemental\Base\Extensions\BaseElementExtension;
-use Fromholdio\Elemental\Base\Model\BetterElementalArea;
+use Fromholdio\Elemental\Base\Model\EvoElementalArea;
 
 /**
  * @mixin BaseElement
  * @mixin BaseElementExtension
  */
-trait BetterElementTrait
+trait EvoElementTrait
 {
     protected ?string $areaName = null;
-    protected ?BetterElementalArea $localArea = null;
-    protected ?BetterElementalArea $currentArea = null;
+    protected ?EvoElementalArea $localArea = null;
+    protected ?EvoElementalArea $currentArea = null;
     protected ?BaseElement $providerElement = null;
     protected ?string $cmsEditLink = null;
     protected array $extraData = [];
@@ -121,7 +121,7 @@ trait BetterElementTrait
             $link = preg_replace('/\/item\/([\d]+)\/edit/', '/item/$1', $link);
         }
 
-        $this->extend('updateBetterCMSEditLink', $link);
+        $this->extend('updateEvoCMSEditLink', $link);
         $this->setCachedCMSEditLink($link);
         return $link;
     }
@@ -167,7 +167,7 @@ trait BetterElementTrait
      * First(), Last() and so forth, from the list of elements
      * in the Area to which it belongs. The Element itself shouldn't
      * have any idea of these nor be able to calculate them itself.
-     * @see BetterElementalArea::getElements().
+     * @see EvoElementalArea::getElements().
      */
 
     public function setExtraData(array $data): self
@@ -205,24 +205,24 @@ trait BetterElementTrait
         return $this->areaName;
     }
 
-    public function setCachedLocalArea(?BetterElementalArea $area): self
+    public function setCachedLocalArea(?EvoElementalArea $area): self
     {
         $this->localArea = $area;
         return $this;
     }
 
-    public function getCachedLocalArea(): ?BetterElementalArea
+    public function getCachedLocalArea(): ?EvoElementalArea
     {
         return $this->localArea;
     }
 
-    public function setCachedCurrentArea(?BetterElementalArea $area): self
+    public function setCachedCurrentArea(?EvoElementalArea $area): self
     {
         $this->currentArea = $area;
         return $this;
     }
 
-    public function getCachedCurrentArea(): ?BetterElementalArea
+    public function getCachedCurrentArea(): ?EvoElementalArea
     {
         return $this->currentArea;
     }
@@ -249,7 +249,7 @@ trait BetterElementTrait
         return $this->cmsEditLink;
     }
 
-    public function isUsingBetterElementalTrait(): bool
+    public function isUsingEvoElementalTrait(): bool
     {
         return true;
     }
@@ -268,13 +268,13 @@ trait BetterElementTrait
         );
     }
 
-    public function getController(): BetterElementController
+    public function getController(): EvoElementController
     {
         $controller = parent::getController();
-        if (!is_a($controller, BetterElementController::class, false)) {
+        if (!is_a($controller, EvoElementController::class, false)) {
             throw new \LogicException(
                 'BaseElement objects require a Controller that is, '
-                . 'or is a subclass of, BetterElementController.'
+                . 'or is a subclass of, EvoElementController.'
             );
         }
         return $controller;

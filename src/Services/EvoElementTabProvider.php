@@ -8,7 +8,7 @@ use SilverStripe\Core\Injector\Injector;
 use SilverStripe\Forms\Tab;
 use SilverStripe\Forms\TabSet;
 
-class BetterElementTabProvider extends ElementTabProvider
+class EvoElementTabProvider extends ElementTabProvider
 {
     /**
      * Generate top level tab names for the given element class (and cache them)

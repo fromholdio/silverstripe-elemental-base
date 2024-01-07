@@ -19,11 +19,11 @@ SilverStripe\Core\Injector\Injector:
   DNADesign\Elemental\Extensions\ElementalContentControllerExtension:
     class: Fromholdio\EmptyExtension\EmptyExtension
   DNADesign\Elemental\Forms\EditFormFactory:
-    class: Fromholdio\Elemental\Base\Forms\BetterEditFormFactory
+    class: Fromholdio\Elemental\Base\Forms\EvoEditFormFactory
   DNADesign\Elemental\Services\ElementTabProvider:
-    class: Fromholdio\Elemental\Base\Services\BetterElementTabProvider
+    class: Fromholdio\Elemental\Base\Services\EvoElementTabProvider
   DNADesign\Elemental\Controllers\ElementController:
-    class: Fromholdio\Elemental\Base\Controllers\BetterElementController
+    class: Fromholdio\Elemental\Base\Controllers\EvoElementController
   DNADesign\Elemental\Extensions\GridFieldDetailFormItemRequestExtension:
     class: Fromholdio\Elemental\Base\Extensions\GridFieldDetailFormItemRequestExtension
 

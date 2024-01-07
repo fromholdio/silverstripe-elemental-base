@@ -4,7 +4,7 @@ namespace Fromholdio\Elemental\Base\Extensions;
 
 use SilverStripe\CMS\Model\SiteTree;
 use SilverStripe\Core\Extension;
-use Fromholdio\Elemental\Base\Controllers\BetterElementController;
+use Fromholdio\Elemental\Base\Controllers\EvoElementController;
 
 class ElementalContentControllerExtension extends Extension
 {
@@ -24,7 +24,7 @@ class ElementalContentControllerExtension extends Extension
      * ----------------------------------------------------
      */
 
-    public function handleElement(): BetterElementController
+    public function handleElement(): EvoElementController
     {
         $request = $this->getOwner()->getRequest();
 
@@ -67,10 +67,10 @@ class ElementalContentControllerExtension extends Extension
         }
 
         $controller = $element->getController();
-        if (!is_a($controller, BetterElementController::class)) {
+        if (!is_a($controller, EvoElementController::class)) {
             throw new \LogicException(
                 get_class($element) . ' must provide a controller that '
-                . 'is or subclasses BetterElementController.'
+                . 'is or subclasses EvoElementController.'
             );
         }
         return $controller;

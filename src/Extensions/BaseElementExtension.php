@@ -6,7 +6,7 @@ use DNADesign\Elemental\Controllers\ElementalAreaController;
 use DNADesign\Elemental\Forms\EditFormFactory;
 use DNADesign\Elemental\Models\BaseElement;
 use Fromholdio\CheckboxFieldGroup\CheckboxFieldGroup;
-use Fromholdio\Elemental\Base\Model\BetterBaseElement;
+use Fromholdio\Elemental\Base\Model\EvoBaseElement;
 use SilverStripe\Admin\LeftAndMain;
 use SilverStripe\Assets\Image;
 use SilverStripe\CMS\Model\SiteTree;
@@ -30,16 +30,16 @@ use SilverStripe\ORM\FieldType\DBHTMLVarchar;
 use SilverStripe\ORM\SS_List;
 use SilverStripe\Security\Permission;
 use SilverStripe\View\Parsers\URLSegmentFilter;
-use Fromholdio\Elemental\Base\BetterElementTrait;
-use Fromholdio\Elemental\Base\Controllers\BetterElementController;
-use Fromholdio\Elemental\Base\Model\BetterElementalArea;
+use Fromholdio\Elemental\Base\EvoElementTrait;
+use Fromholdio\Elemental\Base\Controllers\EvoElementController;
+use Fromholdio\Elemental\Base\Model\EvoElementalArea;
 
 /**
- * @mixin BetterElementTrait
+ * @mixin EvoElementTrait
  */
 class BaseElementExtension extends DataExtension
 {
-    private static $controller_class = BetterElementController::class;
+    private static $controller_class = EvoElementController::class;
 
     private static $is_title_enabled = false;
     private static $is_title_required = false;
@@ -424,7 +424,7 @@ class BaseElementExtension extends DataExtension
         }
         if ($this->getOwner()->isElementalAreasContainer())
         {
-            /** @var ArrayList&BetterElementalArea[] $areas */
+            /** @var ArrayList&EvoElementalArea[] $areas */
             $areas = $this->getOwner()->getElementalAreas();
             foreach ($areas as $area) {
                 $areaElements = $area->getAllMenuElements();
@@ -444,7 +444,7 @@ class BaseElementExtension extends DataExtension
         }
         if ($this->getOwner()->isElementalAreasContainer())
         {
-            /** @var ArrayList&BetterElementalArea[] $areas */
+            /** @var ArrayList&EvoElementalArea[] $areas */
             $areas = $this->getOwner()->getElementalAreas();
             foreach ($areas as $area) {
                 $areaElements = $area->getMenuElements();
@@ -507,25 +507,25 @@ class BaseElementExtension extends DataExtension
                 break;
             }
         }
-        $this->getOwner()->extend('updateBetterRenderTemplates', $classTemplates, $suffix);
+        $this->getOwner()->extend('updateEvoRenderTemplates', $classTemplates, $suffix);
         $templates = $classTemplates;
     }
 
 
     /**
-     * BetterElemental helpers
+     * EvoElemental helpers
      * ----------------------------------------------------
      */
 
-    public function isBetterElementalConfigured(): bool
+    public function isEvoElementalConfigured(): bool
     {
-        $isConfigured = $this->getOwner()->isBetterElementalConfigured;
+        $isConfigured = $this->getOwner()->isEvoElementalConfigured;
         if (is_bool($isConfigured)) {
             return $isConfigured;
         }
-        $isConfigured = $this->getOwner()->hasMethod('isUsingBetterElementalTrait')
-            && $this->getOwner()->isUsingBetterElementalTrait();
-        $this->getOwner()->isBetterElementalConfigured = $isConfigured;
+        $isConfigured = $this->getOwner()->hasMethod('isUsingEvoElementalTrait')
+            && $this->getOwner()->isUsingEvoElementalTrait();
+        $this->getOwner()->isEvoElementalConfigured = $isConfigured;
         return $isConfigured;
     }
 
@@ -535,7 +535,7 @@ class BaseElementExtension extends DataExtension
      * ----------------------------------------------------
      */
 
-    public function getArea(): ?BetterElementalArea
+    public function getArea(): ?EvoElementalArea
     {
         return $this->getOwner()->getCurrentArea() ?? $this->getOwner()->getLocalArea();
     }
@@ -552,7 +552,7 @@ class BaseElementExtension extends DataExtension
         return $name;
     }
 
-    public function getLocalArea(bool $doUseCache = true): ?BetterElementalArea
+    public function getLocalArea(bool $doUseCache = true): ?EvoElementalArea
     {
         if ($doUseCache) {
             $area = $this->getOwner()->hasMethod('getCachedLocalArea')
@@ -565,8 +565,8 @@ class BaseElementExtension extends DataExtension
         $area = null;
         $areaID = (int) $this->getOwner()->getField('ParentID');
         if ($areaID > 0) {
-            /** @var BetterElementalArea $area */
-            $area = BetterElementalArea::get()->find('ID', $areaID);
+            /** @var EvoElementalArea $area */
+            $area = EvoElementalArea::get()->find('ID', $areaID);
         }
 
         if ($this->getOwner()->hasMethod('setCachedLocalArea')) {
@@ -575,7 +575,7 @@ class BaseElementExtension extends DataExtension
         return $area;
     }
 
-    public function setCurrentArea(?BetterElementalArea $area): BaseElement
+    public function setCurrentArea(?EvoElementalArea $area): BaseElement
     {
         if ($this->getOwner()->hasMethod('setCachedCurrentArea')) {
             $this->getOwner()->setCachedCurrentArea($area);
@@ -583,7 +583,7 @@ class BaseElementExtension extends DataExtension
         return $this->getOwner();
     }
 
-    public function getCurrentArea(): ?BetterElementalArea
+    public function getCurrentArea(): ?EvoElementalArea
     {
         return $this->getOwner()->hasMethod('getCachedCurrentArea')
             ? $this->getOwner()->getCachedCurrentArea()
@@ -619,7 +619,7 @@ class BaseElementExtension extends DataExtension
         return $this->getOwner()::has_extension(ElementalAreaController::class);
     }
 
-    public function getTopArea(): ?BetterElementalArea
+    public function getTopArea(): ?EvoElementalArea
     {
         $area = $this->getOwner()->getArea();
         return is_null($area) ? null : $area->getTopArea();
@@ -655,7 +655,7 @@ class BaseElementExtension extends DataExtension
     /**
      * Element providers
      * ----------------------------------------------------
-     * Used in conjunction with BetterElementalArea, for sharing
+     * Used in conjunction with EvoElementalArea, for sharing
      * elements between Areas. This element should either provide elements,
      * that is, when its Area is creating its list of Elements, instead of
      * providing this element, this will be replaced with the elements
@@ -854,7 +854,7 @@ class BaseElementExtension extends DataExtension
             )
         );
 
-        $baseInstance = BetterBaseElement::singleton();
+        $baseInstance = EvoBaseElement::singleton();
         $scaffoldFields = $baseInstance->scaffoldFormFields([
             'tabbed' => false,
             'includeRelations' => false,

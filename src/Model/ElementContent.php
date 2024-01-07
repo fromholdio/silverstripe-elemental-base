@@ -5,9 +5,9 @@ namespace Fromholdio\Elemental\Base\Model;
 use SilverStripe\Forms\FieldList;
 use SilverStripe\Forms\HTMLEditor\HTMLEditorField;
 
-class ElementContent extends BetterBaseElement
+class ElementContent extends EvoBaseElement
 {
-    private static $table_name = 'BetterElementContent';
+    private static $table_name = 'EvoElementContent';
     private static $singular_name = 'Content';
     private static $plural_name = 'Content';
     private static $description = 'Simple content element';

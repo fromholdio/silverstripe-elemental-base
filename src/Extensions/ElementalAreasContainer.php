@@ -12,12 +12,12 @@ use SilverStripe\ORM\ArrayList;
 use SilverStripe\ORM\DataExtension;
 use SilverStripe\ORM\DataObject;
 use SilverStripe\Versioned\Versioned;
-use Fromholdio\Elemental\Base\Model\BetterElementalArea;
+use Fromholdio\Elemental\Base\Model\EvoElementalArea;
 
 class ElementalAreasContainer extends DataExtension
 {
     private static $has_many = [
-        'ContainedAreas' => BetterElementalArea::class . '.ParentContainer'
+        'ContainedAreas' => EvoElementalArea::class . '.ParentContainer'
     ];
 
     /**
@@ -134,7 +134,7 @@ class ElementalAreasContainer extends DataExtension
         }
         if (is_null($area))
         {
-            $existingArea = BetterElementalArea::get()->find('ID', $areaID);
+            $existingArea = EvoElementalArea::get()->find('ID', $areaID);
             if (!is_null($existingArea))
             {
                 try {
@@ -195,7 +195,7 @@ class ElementalAreasContainer extends DataExtension
         $config = $this->getOwner()->getElementalAreaConfig($name)['elemental_areas'] ?? null;
         if (empty($config)) return null;
         $uninheritedConfig = $this->getOwner()->getElementalAreaConfig($name, true)['elemental_areas'] ?? null;
-        return BetterElementalArea::parseElementClassesConfig($config, $uninheritedConfig);
+        return EvoElementalArea::parseElementClassesConfig($config, $uninheritedConfig);
     }
 
 
@@ -314,7 +314,7 @@ class ElementalAreasContainer extends DataExtension
         return $areas;
     }
 
-    public function getElementalArea(string $name): ?BetterElementalArea
+    public function getElementalArea(string $name): ?EvoElementalArea
     {
         $area = $this->getOwner()->getCurrentElementalArea($name);
         if (is_null($area)) {
@@ -328,7 +328,7 @@ class ElementalAreasContainer extends DataExtension
         return $area;
     }
 
-    public function getElementalAreaByURLSegment(string $urlSegment): ?BetterElementalArea
+    public function getElementalAreaByURLSegment(string $urlSegment): ?EvoElementalArea
     {
         $area = null;
         $names = $this->getOwner()->getElementalAreaNames();
@@ -353,7 +353,7 @@ class ElementalAreasContainer extends DataExtension
      * Local: stored in this container's has_one relations
      */
 
-    public function getCurrentElementalArea(string $name): ?BetterElementalArea
+    public function getCurrentElementalArea(string $name): ?EvoElementalArea
     {
         $area = null;
         if ($this->getOwner()->isValidElementalAreaName($name)) {
@@ -361,7 +361,7 @@ class ElementalAreasContainer extends DataExtension
             if (!is_null($config)) {
                 $currentMethodName = $config['current'] ?? $name;
                 $area = $this->getOwner()->{$currentMethodName}($name);
-                if (!$area || !$area->exists() || !is_a($area, BetterElementalArea::class, false)) {
+                if (!$area || !$area->exists() || !is_a($area, EvoElementalArea::class, false)) {
                     $area = null;
                 }
             }
@@ -372,7 +372,7 @@ class ElementalAreasContainer extends DataExtension
         return $area;
     }
 
-    public function getLocalElementalArea(string $name): ?BetterElementalArea
+    public function getLocalElementalArea(string $name): ?EvoElementalArea
     {
         $area = null;
         if ($this->getOwner()->isValidElementalAreaName($name)) {
@@ -380,7 +380,7 @@ class ElementalAreasContainer extends DataExtension
             if (!is_null($config)) {
                 $hasOneName = $config['has_one'] ?? $name;
                 $area = $this->getOwner()->getComponent($hasOneName);
-                if (!$area || !$area->exists() || !is_a($area, BetterElementalArea::class, false)) {
+                if (!$area || !$area->exists() || !is_a($area, EvoElementalArea::class, false)) {
                     $area = null;
                 }
             }
@@ -464,7 +464,7 @@ class ElementalAreasContainer extends DataExtension
      * CurrentElementalAreas will be used over LocalElementalAreas where they exist.
      */
 
-    public function getElementalTopArea(): ?BetterElementalArea
+    public function getElementalTopArea(): ?EvoElementalArea
     {
         return null;
     }
@@ -516,7 +516,7 @@ class ElementalAreasContainer extends DataExtension
     public function updateCMSFields(FieldList $fields): void
     {
         $areas = $this->getOwner()->getLocalElementalAreas();
-        /** @var BetterElementalArea $area */
+        /** @var EvoElementalArea $area */
         foreach ($areas as $area)
         {
             $areaName = $area->getName();

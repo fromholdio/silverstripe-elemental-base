@@ -21,9 +21,9 @@ use Fromholdio\Elemental\Base\Extensions\ElementalAreasContainer;
 /**
  * @mixin Versioned
  */
-class BetterElementalArea extends ElementalArea
+class EvoElementalArea extends ElementalArea
 {
-    private static $table_name = 'BetterElementalArea';
+    private static $table_name = 'EvoElementalArea';
 
     private static $element_classes = [
         'allowed' => [],
@@ -64,7 +64,7 @@ class BetterElementalArea extends ElementalArea
 
     protected array $elementsByID = [];
 
-    protected ?BetterElementalArea $topArea = null;
+    protected ?EvoElementalArea $topArea = null;
     protected ?DataObject $topContainer = null;
     protected ?SiteTree $topPage = null;
 
@@ -145,14 +145,14 @@ class BetterElementalArea extends ElementalArea
         if (!$container->isInDB()) {
             throw new \LogicException(
                 'The container object must be saved to the db before being '
-                . 'set as the BetterElementalArea\'s container.'
+                . 'set as the EvoElementalArea\'s container.'
             );
         }
 
         if (!$container::has_extension(ElementalAreasContainer::class)) {
             throw new \LogicException(
                 'The container object must be extended by ' . ElementalAreasContainer::class
-                . ' to be set as the BetterElementalArea\'s container.'
+                . ' to be set as the EvoElementalArea\'s container.'
             );
         }
 
@@ -305,12 +305,12 @@ class BetterElementalArea extends ElementalArea
             $localElementClass = get_class($localElement);
             if (
                 !isset($configuredClasses[$localElementClass])
-                && !$localElement->isBetterElementalConfigured()
+                && !$localElement->isEvoElementalConfigured()
             ) {
                 throw new \LogicException(
                     $localElementClass . ' is not properly configured to work '
-                    . 'with the BetterElemental extensions. All Element classes require '
-                    . 'the BetterElement trait applied (or BaseElement::isBetterElementalConfigured() '
+                    . 'with the EvoElemental extensions. All Element classes require '
+                    . 'the EvoElement trait applied (or BaseElement::isEvoElementalConfigured() '
                     . 'needs to return true, if you have applied the same interface/features differently).'
                 );
             }
@@ -596,7 +596,7 @@ class BetterElementalArea extends ElementalArea
      * Areas:
      *  - {AreaClassName}_{AreaName}_{suffix}
      *  - {AreaClassName}_{suffix}
-     *  - To and including BetterElementalArea
+     *  - To and including EvoElementalArea
      */
 
     public function getRenderTemplates(string $suffix = ''): array
@@ -705,7 +705,7 @@ class BetterElementalArea extends ElementalArea
             }
         }
         $classes[] = BaseElement::class;
-        $classes[] = BetterBaseElement::class;
+        $classes[] = EvoBaseElement::class;
         return $classes;
     }
 
@@ -723,7 +723,7 @@ class BetterElementalArea extends ElementalArea
             $classInst = $availableClass::singleton();
             if (
                 !in_array($availableClass, $disallowedClasses)
-                && $classInst->isBetterElementalConfigured()
+                && $classInst->isEvoElementalConfigured()
                 && $classInst->canCreate()
             ) {
                 $validClasses[$availableClass] = $classInst->getType();
