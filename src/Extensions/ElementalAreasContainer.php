@@ -42,13 +42,19 @@ class ElementalAreasContainer extends DataExtension
 
     public function updateCMSActions(FieldList $actions)
     {
-        $actions->push(
-            $action = CustomAction::create('doPublishWithAreas', 'Publish (including all blocks)')
-                ->setShouldRefresh(true)
-                ->addExtraClass('btn-outline-primary')
-                ->removeExtraClass('btn-info')
-        );
-        $action->setAttribute('style', 'margin-left:auto;');
+        $action = CustomAction::create('doPublishWithAreas', 'Publish (including all blocks)')
+            ->setShouldRefresh(true)
+            ->addExtraClass('btn-outline-primary')
+            ->removeExtraClass('btn-info');
+
+        $MajorActions = $actions->fieldByName('MajorActions');
+
+        if ($MajorActions) {
+            $MajorActions->push($action);
+        } else {
+            $actions->push($action);
+            $action->setAttribute('style', 'margin-left:auto;');
+        }
     }
 
     public function doPublishWithAreas()
