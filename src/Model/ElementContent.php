@@ -37,10 +37,12 @@ class ElementContent extends EvoBaseElement
 
     public function getCMSFields(): FieldList
     {
+        $this->beforeUpdateCMSFields(function($fields) {
+            $fields->addFieldToTab('Root.Main',
+                HTMLEditorField::create('Content', $this->fieldLabel('Content'))
+            );
+        });
         $fields = parent::getCMSFields();
-        $fields->addFieldToTab('Root.ContentTabSet.Main',
-            HTMLEditorField::create('Content', $this->fieldLabel('Content'))
-        );
         return $fields;
     }
 

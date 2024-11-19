@@ -874,6 +874,7 @@ class BaseElementExtension extends DataExtension
             'CMSName',
             'ParentID',
             'ShowInMenusGroup',
+            'TopPageID',
         ]);
 
         $htmlTextRows = (int) EditFormFactory::config()->get('html_field_rows');
@@ -901,7 +902,7 @@ class BaseElementExtension extends DataExtension
 
         $settingsTab = $fields->findOrMakeTab('Root.Settings');
 
-        if (!$this->isTitleEnabled()) {
+        if (!$this->getOwner()->isTitleEnabled()) {
             $nameField = $this->getOwner()->getNameField();
             $settingsTab->push($nameField);
         }
