@@ -947,16 +947,6 @@ class BaseElementExtension extends DataExtension
         return $fields;
     }
 
-    public function beforeUpdateInlineCMSFields(callable $callback): void
-    {
-        $this->getOwner()->beforeExtending('updateInlineCMSFields', $callback);
-    }
-
-    public function afterUpdateInlineCMSFields(callable $callback): void
-    {
-        $this->getOwner()->afterExtending('updateInlineCMSFields', $callback);
-    }
-
 
     /**
      * Advanced Edit button/message for Inline/React form

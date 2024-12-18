@@ -301,6 +301,15 @@ trait EvoElementTrait
         return $this->isInlineEditable();
     }
 
+    public function beforeUpdateInlineCMSFields(callable $callback): void
+    {
+        $this->beforeExtending('updateInlineCMSFields', $callback);
+    }
+
+    public function afterUpdateInlineCMSFields(callable $callback): void
+    {
+        $this->afterExtending('updateInlineCMSFields', $callback);
+    }
 
     /**
      * No longer necessary/relevant
