@@ -38,8 +38,7 @@ trait EvoElementTrait
         if (!is_null($container) && $container->hasMethod('Link'))
         {
             $link = Controller::join_links(
-                $container->Link(),
-                $action,
+                $container->Link($action),
                 '#' . $this->getAnchor()
             );
         }
@@ -54,8 +53,7 @@ trait EvoElementTrait
         if (!is_null($container) && $container->hasMethod('AbsoluteLink'))
         {
             $link = Controller::join_links(
-                $container->AbsoluteLink(),
-                $action,
+                $container->AbsoluteLink($action),
                 '#' . $this->getAnchor()
             );
         }
