@@ -27,11 +27,12 @@ class GridFieldDetailFormItemRequestExtension extends Extension
 
     public function updateFormActions(FieldList $actions)
     {
-        // Check if record is versionable
         /** @var DataObject $record */
         $record = $this->getOwner()->getRecord();
         $ownerHasAreas = $record
             && $record->hasMethod('getElementalAreas')
+            && $record->hasMethod('doPublishWithAreas')
+            && $record->config()->get('do_add_publish_with_blocks_action') !== false
             && $record->getElementalAreas();
 
         // Add extra actions prior to extensions so that these can be modified too
@@ -55,6 +56,14 @@ class GridFieldDetailFormItemRequestExtension extends Extension
     {
         /** @var DataObject $record */
         $record = $this->getOwner()->getRecord();
+
+        if (
+            !$record
+            || !$record->hasMethod('doPublishWithAreas')
+            || $record->config()->get('do_add_publish_with_blocks_action') === false
+        ) {
+            return $this->getOwner()->httpError(403);
+        }
 
         $record->doPublishWithAreas();
 
