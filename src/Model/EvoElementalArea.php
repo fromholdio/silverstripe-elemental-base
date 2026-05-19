@@ -345,7 +345,9 @@ class EvoElementalArea extends ElementalArea
         }
 
         $container = $this->getContainer();
-        $container->invokeWithExtensions('updateAreaAllElements', $elements, $this);
+        if ($container) {
+            $container->invokeWithExtensions('updateAreaAllElements', $elements, $this);
+        }
 
         $this->allElements = $elements;
         return $elements;
