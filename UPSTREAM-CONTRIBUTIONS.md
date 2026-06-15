@@ -220,6 +220,67 @@ issues plus four open ones, over-delivers on what #1407 asks for, and is a coher
 self-contained fix. Opening an issue that references #718/#871/#1407 to propose the
 approach — before writing code — is the low-risk way to test maintainer appetite.
 
+## Alternative PR shapes (brainstorm)
+
+This section does **not** change the recommendations or tiers above. It is a non-binding
+brainstorm of *different ways to package* the same candidates so they ride on demand that
+already exists, or match how the tracker is organised. This is about acceptance strategy,
+not about what the code does.
+
+### Ride the wanted feature — bundle low-demand machinery into a high-demand door
+
+**Block identity & anchors** is the bucket worth packaging — with one refinement.
+elemental-base's `Title` (headline), `Name` (CMS label) and `AnchorName` / derived anchor
+are one coherent "how is this block identified and addressed" surface: the anchor derives
+from the title/name. But upstream demand here is **anchor-shaped, not name-shaped** — open
+PR **#1320** explicitly wants *human-readable* block anchors, while a separate CMS-only
+`Name` field has no demand at all. So the demand-aligned shape is an **anchor-led** PR: an
+editable, human-readable `AnchorName` whose value derives from the block's title (and which
+can harvest in-content anchors), landing most of the identity machinery through the door
+that is actually open. The `Name`/`Title` *split* then becomes an optional follow-up rather
+than the headline — keep the first PR focused on anchors (maintainers favour tight scope)
+and float `Name` as a sequel once the anchor surface exists. So: yes, it is a natural
+bucket — but lead with anchors, not with Name/Title.
+
+### Split to land the safe part first
+
+**Edit links (A1 + A2).** Instead of one PR, carve out the minimal, hard-to-argue-with fix
+— "non-page / ModelAdmin element edit links shouldn't break or resolve the wrong relation"
+(directly satisfying #1407 and #778) — and propose the customisation hooks
+(`getElementCMSEditLink()` / `updateEvoCMSEditLink`) as a *separate, later* PR. The first is
+a bug fix tied to tracked issues; the second is API design that benefits from its own
+discussion. Splitting raises the odds the core fix lands quickly.
+
+### Reframe a model change as the bug fix it implies
+
+**Multi-area (A4)** is the exemplar: don't propose the named-area model, propose the fix for
+#715 ("can't publish with two areas"). The same move applies anywhere an elemental-base
+feature exists *because* it fixed a latent multi-area / non-page bug — extract the bug fix,
+leave the model at home.
+
+### Cluster by the user workflow the tracker already groups around
+
+**Elements that handle their own requests (A3 + C4).** #960 (controller has no request),
+#965 / #1435 / #1436 (forms-in-elements hang or misbehave) and redirect handling are all
+one workflow: an element responding to a request. A focused "element controllers get the
+request before init, and can emit a redirect" PR is motivated by that whole cluster of form
+bugs — a stronger story than either fix alone, and without needing the area-scoped router
+rewrite.
+
+### Align with an in-flight PR instead of competing
+
+Where upstream already has a PR moving the right direction — **#1320** (anchors), **#880**
+(field placement), **#1259** (TopPage) — the best "shape" is a review comment plus an
+offered enhancement on *their* branch, not a parallel PR. Lowest friction, and it builds the
+relationship that makes the larger contributions easier later.
+
+### Where reshaping does *not* help
+
+The Tier-D architecture (named areas, polymorphic parent, current/local inheritance,
+area-scoped routing, CMS form restructure) cannot be reshaped into a small wanted PR — there
+is no demand wedge and no way to split it without it ceasing to be the thing it is. Its only
+realistic venue stays the RFC discussion (#347 / #159).
+
 ## Appendix — feature → issue/PR map
 
 | elemental-base feature | Tier | Open issues | Open PRs | Closed (evidence) |
