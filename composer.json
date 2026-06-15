@@ -16,6 +16,7 @@
     "dnadesign/silverstripe-elemental": "^6.0.2",
     "fromholdio/silverstripe-checkboxfieldgroup": "^1.2.0",
     "fromholdio/silverstripe-cms-fields-placement": "^1.2.0",
+    "fromholdio/silverstripe-empty-extension": "^1.2.0",
     "lekoala/silverstripe-cms-actions": "^2.0.0"
   },
   "autoload": {
