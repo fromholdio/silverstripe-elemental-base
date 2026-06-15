@@ -88,6 +88,8 @@ private static $cascade_deletes = [
 
 Be careful with inherited/current areas. Only cascade delete the local relations that truly belong to the record.
 
+Without `cascade_deletes`, deleting a container can leave orphaned area records behind.
+
 ## Area Parent Container Fields
 
 `EvoElementalArea` stores:

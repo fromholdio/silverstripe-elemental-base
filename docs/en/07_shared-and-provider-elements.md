@@ -141,14 +141,17 @@ If a shared pool is managed in ModelAdmin, make sure the shared pool record has 
 
 ## Provider Elements Versus Virtual Elements
 
-Upstream Elemental has historically had virtual/shared-element modules and patterns. This module's provider model is intentionally simpler:
+The separate `silverstripe-elemental-virtual` module uses virtual records to mirror a shared block by ID. This module's provider model is intentionally
+simpler:
 
 - the shared element remains a normal element in its source area
 - the provider controls where it appears
 - the provided element receives current page and area context
 - no template needs to know it is rendering shared content unless it wants to
 
-This does not make the upstream approach wrong. It is a different trade-off. Provider elements are a good fit when the shared content should behave like real content inside the current area.
+This does not make the virtual-element approach wrong. It is a different trade-off. Recent upstream Elemental releases also support moving elements between
+areas, but moving a block is a different concern from rendering shared content in context. Provider elements are a good fit when shared content should
+behave like real content inside the current area.
 
 ## Rendering Lists With Providers
 
