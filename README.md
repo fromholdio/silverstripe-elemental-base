@@ -50,8 +50,9 @@ the vendor module's React editor, versioning, and overall shape intact.
   handle its own GET/POST requests.
 - **Per-element-class permissions** — granular `VIEW/EDIT/CREATE/DELETE/MANAGE`
   permission codes per element class, cascading through area to container.
-- **Publish with blocks** — a one-click action that publishes a container together
-  with every area it owns.
+- **Publishing on purpose** — publishing a page no longer force-publishes every draft
+  block (stock Elemental's owns-cascade default); a one-click "Publish with blocks"
+  action lets editors push a container and its areas live when they choose.
 - **Anchors & on-page navigation** — per-element anchors (optionally harvested from
   HTML fields) and a menu-visibility flag for building "on this page" navigation.
 - **A tidier editor** — reworked inline and full edit forms, a Content/Settings tab
@@ -114,11 +115,21 @@ scoped to the areas present on the current request, with `handled_elemental_area
 to opt areas in or out of routing. An element can therefore act as its own request
 handler with enough context to resolve correctly even when nested or shared.
 
+**Auto-publishing every block → publishing on purpose.**
+Stock Elemental wires `Page → owns → ElementalArea → owns → Elements`, so publishing a
+page cascade-publishes every draft and modified block under it. That default is
+contested — disabling it is the most-supported open request on the upstream tracker
+([#756](https://github.com/silverstripe/silverstripe-elemental/issues/756), filed by a
+core maintainer) — and it only sharpens with several areas, where one page publish pushes
+drafts live across all of them. elemental-base declares no `Page → Area` ownership, so a
+page publish leaves blocks as they are, and adds a friendly "publish with blocks" action
+for when an editor chooses to push everything live. (Areas still own their elements, so a
+developer who wants the cascade can add the area relations to `$owns`.)
+
 **Additions on top.**
 elemental-base also adds per-area allowed/disallowed element classes (with inheritance
-controls), per-element-class CRUD permission codes that cascade through area to
-container, and a "publish (including all blocks)" action that cascades a publish
-across every area a container owns.
+controls) and per-element-class CRUD permission codes that cascade through area to
+container.
 
 ### Lineage
 
