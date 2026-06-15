@@ -19,6 +19,18 @@ public function getInlineCMSFields(): FieldList
 
 This lets an element expose a compact inline form while keeping the full `getCMSFields()` form for advanced editing.
 
+`getInlineCMSFields()` starts from scaffolded fields and then applies the element's inline field update hooks. You can tune the scaffold step with `scaffold_cms_fields_settings`:
+
+```php
+private static $scaffold_cms_fields_settings = [
+    'ignoreFields' => [
+        'Content',
+    ],
+];
+```
+
+This is useful when a field is added manually to a specific tab, or when a relation should not appear in the compact inline form.
+
 ## Inline Tabs
 
 `EvoElementTabProvider` reads tab information from `getInlineCMSFields()` rather than the full CMS form.
@@ -74,6 +86,8 @@ When title is disabled, the name field is shown in settings. The name field desc
 - `fileTitle`
 
 The module's CMS React summary displays text and/or image previews and hides empty filler summaries when an element has no previewable content.
+
+The CMS bundle registers replacements for Elemental's `ElementActions` and `ElementSummary` components. Those replacements are intentionally small: action menus can show inline tabs and advanced edit links, and summaries can show the schema values added by `updateBlockSchema()`.
 
 Add summary parts:
 
@@ -149,6 +163,17 @@ The module replaces Elemental breadcrumb behavior that assumes an `ElementalArea
 Block breadcrumbs use the element CMS title and type, and area breadcrumbs link back to the owning container when possible.
 
 This matters when areas live on SiteConfig, custom DataObjects, nested elements, or local/current area arrangements.
+
+## ModelAdmin And Advanced Edit Links
+
+Element detail links can be fragile when blocks are owned by a `DataObject` outside `CMSMain`, because the correct URL depends on the owner record, the ModelAdmin route, and the area relation being edited.
+
+This was historically tracked upstream in issues such as [silverstripe/silverstripe-elemental#718](https://github.com/silverstripe/silverstripe-elemental/issues/718) and [silverstripe/silverstripe-elemental#871](https://github.com/silverstripe/silverstripe-elemental/issues/871). Current upstream Elemental has improved this by letting non-page owners participate through `getCMSEditLink()`. Elemental Base keeps that expectation, and adds two project-facing escape hatches:
+
+- implement `getElementCMSEditLink($element, $area, $relationName, $container)` on the container
+- extend the element with `updateEvoCMSEditLink(&$link)`
+
+Use those hooks when the default ModelAdmin URL is not the one editors should land on.
 
 ## Publish With Blocks
 

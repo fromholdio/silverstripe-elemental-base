@@ -73,6 +73,27 @@ class ElementCallout extends EvoBaseElement
 
 If an element is not configured with the `EvoElementTrait` contract, `EvoElementalArea::getAllElements()` will throw a logic exception.
 
+## Common Element Config
+
+These are the config flags most elements touch first:
+
+| Config | Default | Use |
+| --- | --- | --- |
+| `controller_class` | `EvoElementController::class` | Custom request handling for the element. |
+| `inline_editable` | `true` | Use the inline React form instead of opening the full GridField detail form first. |
+| `is_title_enabled` | `false` | Show and use the public `Title` field. |
+| `is_title_required` | `false` | Require the public title when enabled. |
+| `is_name_enabled` | `true` | Show the CMS-only `Name` field. |
+| `is_name_required` | `false` | Require the CMS-only name. |
+| `is_advanced_edit_enabled` | `true` | Show a link from inline editing to the full edit form. |
+| `advanced_edit_instruction` | `to edit more settings.` | Text used alongside the advanced edit link. |
+| `is_anchors_enabled` | `true` | Allow the element to produce anchors when the area also allows them. |
+| `anchor_field_names` | `[]` | HTML fields to scan for anchors inside the element. |
+| `is_menu_visibility_enabled` | `true` | Allow the element to appear in area menu helpers. |
+| `is_menu_visibility_forced` | `false` | Treat the element as menu-visible without showing the editor field. |
+| `is_cms_history_enabled` | `false` | Show the standalone element history tab. |
+| `holder_templates` | `[]` | Override the normal area-aware holder template stack. |
+
 ## Title And Name
 
 The module separates a public title from a CMS-only name.
@@ -86,6 +107,22 @@ private static $is_name_required = false;
 ```
 
 Use `Title` for content that can appear on the front end. Use `Name` to help editors identify a block in the CMS when a public title is not appropriate.
+
+`EvoBaseElement` stores `Name`, `AnchorName`, and `ShowInMenus` through the extension layer. Those fields support CMS labelling, anchors, and menu visibility.
+
+## Bundled Content Element
+
+The module includes `Fromholdio\Elemental\Base\Model\ElementContent`, a simple inline-editable content element that extends `EvoBaseElement`.
+
+It provides:
+
+- an `HTMLText` `Content` field
+- public title support
+- advanced edit link support
+- anchor and menu visibility support
+- `Content` anchor scanning
+
+Use it directly for simple content blocks, or treat it as a reference implementation for project-specific elements.
 
 ## Anchors
 

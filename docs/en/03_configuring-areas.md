@@ -43,11 +43,19 @@ private static $elemental_areas = [
 
 The config key, such as `ContentArea`, is the area name. By default it is also the relation name.
 
+## Containers Beyond Pages
+
+`ElementalAreasContainer` can be applied to any `DataObject`, not only `Page`. The module applies it to `Page` and `SiteConfig` by default, and projects can apply it to ModelAdmin-managed records or custom container objects.
+
+For CMS links to work well on non-page containers, the owner should expose a useful `getCMSEditLink()` or `CMSEditLink()` method. If the default link shape is not right for your ModelAdmin or custom CMS section, implement `getElementCMSEditLink($element, $area, $relationName, $container)` on the container or use the `updateEvoCMSEditLink` extension hook on elements.
+
+Current upstream Elemental has improved support for Elemental areas on arbitrary `DataObject`s, but it still depends on the owner object and relation lookup producing a valid edit link. This module keeps that requirement explicit and customisable.
+
 ## Config Keys
 
 ### `enabled`
 
-Controls whether the CMS field for this area is shown.
+Controls whether the area is active for automatic CMS field insertion.
 
 ```yaml
 Page:
@@ -57,6 +65,8 @@ Page:
 ```
 
 This is useful for subclasses that inherit an area config but should not expose every area.
+
+An enabled area still needs `cms_fields` placement config if you want this module to insert the generated `ElementalAreaField` automatically. Without `cms_fields`, the area can still be accessed through the container API or rendered in templates, but no field is placed for it during `updateCMSFields()`.
 
 ### `has_one`
 
@@ -187,6 +197,16 @@ private static $element_classes = [
 
 `allowed` limits the list to those classes. `disallowed` removes classes. `do_stop_inherit` resets inherited allowed and disallowed lists before applying the current class config.
 
+When the CMS builds the add-block list for an area, the module:
+
+1. starts with `allowed` classes, or all subclasses of upstream `BaseElement` if `allowed` is empty
+2. removes `disallowed` classes, plus the abstract base classes
+3. keeps only classes whose singleton is configured for elemental-base through `isEvoElementalConfigured()`
+4. keeps only classes the current member can create through `canCreate()`
+5. sorts by block type when `do_sort_alphabetically` is enabled
+
+If a class does not appear in the add-block menu, check both the area restrictions and the element's elemental-base configuration.
+
 The module also supports container-level per-area class restrictions. For historical reasons, the nested key currently read by the code is `elemental_areas`:
 
 ```yaml
@@ -226,6 +246,26 @@ Templates can then use:
     $ComponentsArea
 <% end_if %>
 ```
+
+## Container API Quick Reference
+
+Use the configured area name, not the relation name, with these helpers:
+
+| Method | Use |
+| --- | --- |
+| `getElementalArea($name)` | Return current area, falling back to local area. |
+| `getCurrentElementalArea($name)` | Call the configured current-area method. |
+| `getLocalElementalArea($name)` | Return the stored `has_one` relation. |
+| `getElementalAreas()` | Return all available named areas, using current where available. |
+| `getLocalElementalAreas()` | Return local stored areas only. |
+| `getElementalAreaNames()` | Return configured area names. |
+| `isValidElementalAreaName($name)` | Check whether a name exists in `elemental_areas`. |
+| `isElementalAreaEnabled($name)` | Check the area's `enabled` config. |
+| `getElementalAreaRelationName($name)` | Resolve the local relation name. |
+| `getElementalAreaURLSegment($name)` | Resolve the route segment for handler URLs. |
+| `getElementalAreaByURLSegment($segment)` | Resolve an area from an area route segment. |
+| `getElementByID($id)` | Find an element across local, nested, and provided elements. |
+| `getCurrentElementByID($id, $areaNames = null)` | Find an element across current areas. |
 
 ## Disabling Areas Per Page Type
 

@@ -18,6 +18,18 @@ If anchors are enabled and `AnchorName` is empty, the module can derive the anch
 </section>
 ```
 
+Useful element methods:
+
+```php
+$element->getAnchor();
+$element->getLocalAnchor();
+$element->getAnchorTitle();
+$element->getLocalAnchorTitle();
+$element->getAnchorsInElement();
+```
+
+`getAnchor()` and `getAnchorTitle()` may take provider context into account. `getLocalAnchor()` and `getLocalAnchorTitle()` describe the element record itself.
+
 ## Area-Level Anchor Control
 
 Areas can disable anchors for all elements in that area.
@@ -45,10 +57,21 @@ private static $anchor_field_names = [
 
 The element collects anchors from those fields and exposes them through `getAnchorsInElement()`.
 
+Only fields that resolve to `DBHTMLText` or `DBHTMLVarchar` are scanned. Other fields listed in `anchor_field_names` are ignored.
+
 Areas collect:
 
 - each element's own local anchor
 - anchors found inside configured element fields
+
+Use these methods on an area:
+
+```php
+$area->getAnchorsInArea();
+$area->getAllAnchorsInArea();
+```
+
+`getAnchorsInArea()` uses renderable elements from `getElements()`. `getAllAnchorsInArea()` uses `getAllElements()`, including elements that may not render for the current viewer.
 
 ## Page Anchors
 

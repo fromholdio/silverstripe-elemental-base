@@ -87,6 +87,14 @@ A provider element is an element that supplies other elements in its place. Prov
 
 That matters for shared elements: the same block can be defined in a shared pool, but rendered in the context of a page area through a provider record.
 
+## Configuration Gate
+
+`BaseElementExtension` is applied to upstream `BaseElement`, but `EvoElementalArea` still needs to know that an element has the full elemental-base contract.
+
+For project elements, extending `EvoBaseElement` is the usual path. If an element extends upstream `BaseElement` directly, it should use `EvoElementTrait` or otherwise make `isEvoElementalConfigured()` return true.
+
+This check is deliberate. It prevents an area from silently rendering elements that cannot provide contextual links, current/local area state, provider state, and the other methods this module expects.
+
 ## Top Area, Top Container, And Top Page
 
 Nested elements and nested areas can be several levels away from the page that is being rendered. The module provides helpers to climb back to the top render context:
@@ -101,4 +109,6 @@ These are used by links, controller routing, template context, and CMS edit link
 
 Current upstream Elemental supports multiple `ElementalArea` relations. It discovers those relations from `has_one` config and places an `ElementalAreaField` for each relation.
 
-This module starts from named area config instead. That adds a small amount of upfront structure, but gives the rest of the system a stable area identity to work with.
+Current upstream Elemental also has DataObject-oriented improvements, including CMS edit-link handling for non-page owners that implement `getCMSEditLink()`. This module builds on the same general direction but makes the owner, area name, local/current area, and edit-link hooks part of a single named-area contract.
+
+That adds a small amount of upfront structure, but gives the rest of the system a stable area identity to work with.

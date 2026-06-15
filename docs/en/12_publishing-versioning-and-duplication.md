@@ -48,6 +48,10 @@ SilverStripe\SiteConfig\SiteConfig:
   do_add_publish_with_blocks_action: false
 ```
 
+When a container is edited through a GridField detail form, this module's `GridFieldDetailFormItemRequestExtension` can add a related "Publish (including all blocks)" action to that detail form. This is useful for ModelAdmin-managed containers that own areas.
+
+For custom containers, make sure the record has a CMS edit link that points back to the right editor. The page action redirects through `getCMSEditLink()`, and element advanced edit links build on the same owner-edit-link contract.
+
 ## Current Areas Versus Local Areas
 
 Publishing helpers operate on local areas.

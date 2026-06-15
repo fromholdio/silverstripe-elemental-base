@@ -95,6 +95,12 @@ Global Anchors can provide project-level anchors such as:
 
 Elemental Base contributes anchors from areas and elements. Global Anchors complements that with anchors that are not block-derived.
 
+### `fromholdio/silverstripe-superlinker`
+
+Superlinker can provide richer link-picking workflows that include page anchors and element anchors.
+
+Elemental Base works without Superlinker. The useful combination is for projects where editors need to create links to specific blocks or anchors from a structured link field rather than manually typing `#anchor` fragments.
+
 ### `fromholdio/bundle-elemental`
 
 Bundle modules can provide project defaults, such as disallowing upstream `ElementContent` and preferring this module's `ElementContent`.

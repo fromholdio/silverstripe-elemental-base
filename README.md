@@ -6,6 +6,8 @@ It keeps Elemental as the underlying block editor, but adds a more explicit mode
 
 The module grew out of long-running production use. Some of the problems it originally solved have also improved upstream over time. For example, current Silverstripe Elemental supports multiple `ElementalArea` relations and documents how to configure them. This module is therefore not a replacement for a missing feature so much as a different contract: it treats named areas and element context as first-class concepts, rather than as relationship names discovered at the edge of the stock extension.
 
+Earlier versions of this work existed as `silverstripe-elemental-multiareas` and `silverstripe-elemental-inheritablearea`. Those concerns are still visible here, but the module has grown into a broader base layer for contextual elemental areas and elements.
+
 ## Requirements
 
 - Silverstripe CMS 6
@@ -20,6 +22,22 @@ vendor/bin/sake dev/build flush=1
 ```
 
 If you maintain compiled CMS assets in your project, rebuild them using your usual frontend pipeline. The module ships prebuilt CMS assets under `client/dist`.
+
+## What It Overrides
+
+The module keeps upstream Elemental installed and active, but swaps a few services and extensions so named areas, contextual routing, and richer CMS edit links can work consistently.
+
+| Target | Replacement or addition | Purpose |
+| --- | --- | --- |
+| `DNADesign\Elemental\Extensions\ElementalContentControllerExtension` | `Fromholdio\EmptyExtension\EmptyExtension` | Disables the stock `element/$ID` content-controller route. |
+| `DNADesign\Elemental\Forms\EditFormFactory` | `EvoEditFormFactory` | Builds inline forms from `getInlineCMSFields()`. |
+| `DNADesign\Elemental\Services\ElementTabProvider` | `EvoElementTabProvider` | Reads inline tabs from the inline CMS field list. |
+| `DNADesign\Elemental\Controllers\ElementController` | `EvoElementController` | Adds context-aware links, handler links, redirects, and nested routing support. |
+| `DNADesign\Elemental\Extensions\GridFieldDetailFormItemRequestExtension` | elemental-base extension | Improves breadcrumbs and adds publish-with-blocks actions for area containers. |
+| `ContentController` | `ElementsRouter` extension | Adds `/area/<area-segment>/<element-id>` handler routing. |
+| `Page` and `SiteConfig` | `ElementalAreasContainer` extension | Lets those records define named elemental areas. |
+| `DNADesign\Elemental\Models\BaseElement` | `BaseElementExtension` | Adds the element-side contract used by `EvoElementalArea`. |
+| `ElementalAreaController` | `ElementalAreaControllerExtension` | Adds API data used by the CMS editor. |
 
 ## What It Adds
 
@@ -131,7 +149,7 @@ The module replaces several Elemental services and extends core element behavior
 
 This module depends on upstream Elemental and deliberately keeps using its core models, CMS field, controller, and versioned block infrastructure. It does, however, replace or bypass some upstream behavior where the assumptions diverge.
 
-Current upstream Elemental supports additional area relations, and its documentation explains how to add them manually. It also added more cross-area moving support in recent 6.2 releases. The difference in this module is the surrounding contract:
+Current upstream Elemental supports additional area relations, and its documentation explains how to add them manually. It also has improvements for Elemental areas owned by non-page `DataObject`s, provided the owner can supply a usable CMS edit link. It also added more cross-area moving support in recent 6.2 releases. The difference in this module is the surrounding contract:
 
 - areas are configured by stable names, not only discovered by relation class
 - a local area and current area can be different objects
@@ -140,6 +158,7 @@ Current upstream Elemental supports additional area relations, and its documenta
 - elements can provide other elements in context
 - nested area containers are part of the normal traversal model
 - links, templates, anchors, menus, and CMS edit links are resolved through that context
+- ModelAdmin and custom-owner edit links can be customised through `getElementCMSEditLink()` or `updateEvoCMSEditLink()`
 
 For simple "one page, one content area" projects, stock Elemental may be enough. This module is aimed at projects where blocks are part of the page architecture: main content, hero asides, sidebars, footers, reusable sections, nested groups, shared blocks, forms, feeds, and other content systems that need explicit area semantics.
 
@@ -171,6 +190,7 @@ Start with the docs index:
 - [`fromholdio/silverstripe-formidable`](https://github.com/fromholdio/silverstripe-formidable) provides form elements and routing hooks that sit naturally inside `EvoElementController`.
 - `fromholdio/silverstripe-feeder` can expose feed/listing elements that extend `EvoBaseElement`.
 - `fromholdio/silverstripe-globalanchors` can add project-wide anchors alongside area and element anchors.
+- `fromholdio/silverstripe-superlinker` can use page and element anchors in richer link-picking workflows.
 - `fromholdio/silverstripe-cms-fields-placement`, `fromholdio/silverstripe-checkboxfieldgroup`, `fromholdio/silverstripe-empty-extension`, and `lekoala/silverstripe-cms-actions` are direct implementation dependencies used by this module.
 
 These are not a required stack. They are examples of the kind of module this base layer is intended to support.

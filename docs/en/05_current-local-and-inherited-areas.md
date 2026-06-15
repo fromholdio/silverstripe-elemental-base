@@ -84,6 +84,36 @@ public function getCurrentSideArea(string $name): ?EvoElementalArea
 
 The returned area may physically belong to another record. The module sets the current container and area name before returning it, so rendered elements still behave as part of the current page.
 
+## Merging Or Replacing Area Elements
+
+Sometimes the current area is not just one source. You may want local page blocks plus a shared intro area, or a selected source area that replaces the local elements for a request.
+
+`EvoElementalArea` supports both patterns:
+
+```php
+$area->mergeWithArea($sharedIntroArea);
+$area->replaceWithArea($selectedArea);
+```
+
+`mergeWithArea()` appends the other area's local elements to the current area's local element list. `replaceWithArea()` uses the other area's local elements instead of the current area's own local elements.
+
+Both methods accept a second `$doOverride` argument. When true, the new merge or replace list overwrites any previous merge or replace list already set on that area instance.
+
+```php
+public function getCurrentBodyArea(string $name): ?EvoElementalArea
+{
+    $area = $this->BodyArea();
+
+    if ($this->SharedIntroAreaID) {
+        $area->mergeWithArea($this->SharedIntroArea());
+    }
+
+    return $area;
+}
+```
+
+The merge/replace state is request-local object state. It changes how the area builds its element list for the current render path; it does not move elements between areas or write relationship changes.
+
 ## Site Defaults
 
 `SiteConfig` is extended with `ElementalAreasContainer` by default. That makes it a natural place for global default areas.

@@ -127,6 +127,18 @@ class SharedElementsConfig extends DataObject
 
 Provider elements can then select from those pools.
 
+## Editing Shared Content
+
+Provided elements render in the provider's current area context, but they are still real records owned by their source area.
+
+That means:
+
+- front-end links, anchors, and menu visibility can use the provider/current area context
+- edit permissions and breadcrumbs should still resolve through the element's local owner
+- the shared element should be edited where it is stored, not silently cloned into the provider's area
+
+If a shared pool is managed in ModelAdmin, make sure the shared pool record has a useful `getCMSEditLink()` or project-specific `getElementCMSEditLink()` implementation so advanced edit links can return editors to the right CMS section.
+
 ## Provider Elements Versus Virtual Elements
 
 Upstream Elemental has historically had virtual/shared-element modules and patterns. This module's provider model is intentionally simpler:

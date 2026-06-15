@@ -2,6 +2,50 @@
 
 The module expands Elemental's template selection so elements can render differently by area type and area name.
 
+## Render Chain
+
+Area rendering follows the same broad shape as upstream Elemental, with extra context added before each element controller renders:
+
+1. an area renders with its area template
+2. the area template loops `$ElementControllers`
+3. each `EvoElementController` renders a holder template
+4. the holder template outputs `$ElementForTemplate`
+5. the element renders with its element template stack
+
+The module does not try to own your front-end design system. Projects should provide the area, holder, and element templates that match their markup.
+
+## Minimum Templates
+
+A simple area template can loop the element controllers:
+
+```ss
+<% if $ElementControllers %>
+    <% loop $ElementControllers %>
+        $Me
+    <% end_loop %>
+<% end_if %>
+```
+
+A simple holder template can wrap the rendered element:
+
+```ss
+<section id="$Element.Anchor" class="element element--$Element.SimpleClassName">
+    $ElementForTemplate
+</section>
+```
+
+Then each project element should provide its own element template, for example:
+
+```ss
+<%-- templates/App/Elemental/Elements/ElementCallout.ss --%>
+<% if $Title %>
+    <h2>$Title</h2>
+<% end_if %>
+$Content
+```
+
+Use these as starting points only. Most projects will want area-specific wrappers, design-system classes, and element-specific markup.
+
 ## Area Templates
 
 `EvoElementalArea::getRenderTemplates()` builds template candidates from the area class and area name.

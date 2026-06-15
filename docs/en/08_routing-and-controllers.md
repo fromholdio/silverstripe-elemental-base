@@ -80,6 +80,10 @@ use Fromholdio\Elemental\Base\Controllers\EvoElementController;
 
 class ElementSignupController extends EvoElementController
 {
+    private static $url_handlers = [
+        'submit' => 'submit',
+    ];
+
     private static $allowed_actions = [
         'submit',
     ];
@@ -98,6 +102,8 @@ private static $controller_class = App\Elemental\Controllers\ElementSignupContro
 ```
 
 If the controller does not extend `EvoElementController`, the module throws a logic exception.
+
+`EvoElementController` is also extended with `ElementsRouter`. That allows handler lookup to continue through nested area containers when an element controller is itself the current controller context.
 
 ## Requests During Template Rendering
 
