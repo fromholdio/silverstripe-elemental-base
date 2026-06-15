@@ -78,6 +78,27 @@ administrators bypass them. If you want the codes to appear as labelled checkbox
 **Security → Groups**, expose them from a `PermissionProvider` in your project — for
 example returning `MANAGE_ELEMENTS_ALL` and a `MANAGE_ELEMENT_*` code per block type.
 
+```php
+use SilverStripe\Security\PermissionProvider;
+
+class ElementPermissions implements PermissionProvider
+{
+    public function providePermissions(): array
+    {
+        return [
+            'MANAGE_ELEMENTS_ALL' => [
+                'name' => 'Manage all content blocks',
+                'category' => 'Content blocks',
+            ],
+            'EDIT_ELEMENT_CONTENTELEMENT' => [
+                'name' => 'Edit Content blocks',
+                'category' => 'Content blocks',
+            ],
+        ];
+    }
+}
+```
+
 ## Next
 
 - [Inheritance & sharing](05_inheritance-and-sharing.md) — why shared blocks edit

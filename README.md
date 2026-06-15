@@ -40,8 +40,8 @@ the vendor module's React editor, versioning, and overall shape intact.
   page-bound relation, so the same area can be attached, inherited from a parent, or
   shared site-wide.
 - **Clean element sharing** — an element can *provide* other elements in its place,
-  and an area can *merge* or *replace* its contents with another area's — a
-  straightforward replacement for `ElementVirtual`.
+  and an area can *merge* or *replace* its contents with another area's, so shared
+  blocks stay real elements rather than virtual clones.
 - **`Title` vs `Name`** — a public, optional headline (`Title`) kept separate from a
   CMS-only identifier (`Name`), so editors can label a headingless block without
   abusing the title.
@@ -62,43 +62,58 @@ the vendor module's React editor, versioning, and overall shape intact.
 
 The vendor `dnadesign/silverstripe-elemental` module is solid, and elemental-base
 keeps everything good about it. But several of its design decisions are awkward to
-live with on larger builds, and this module takes a different position on each.
+live with on larger builds, and this module takes a different position on each. The
+comparisons below are against the current Elemental 6.2 line; where upstream has since
+addressed something, that is noted.
 
-**One area per page → many named areas, on anything.**
-Vendor elemental gives a page a single `ElementalArea`. A second area on the same
-page, or any area on a non-page object (`SiteConfig`, a `ModelAdmin`-managed record),
-means working against the grain. elemental-base lets you declare any number of named
-areas on any DataObject, each an independent relation with its own configuration.
+**Relation-discovered areas → named, configured areas.**
+Upstream Elemental does support multiple areas — you add extra `has_one` relations to
+`ElementalArea` and it discovers them by scanning relations. What it does not give you
+is a *contract*. elemental-base identifies each area by a stable name and hangs
+per-area configuration off that name: the element types the area accepts, a URL
+segment for routing, where its field sits in the CMS, and a current/local split for
+inheritance. Routing, templates, permissions and CMS placement all key off the name,
+so an area is a first-class thing the rest of the system addresses — not a relation
+rediscovered at the edge of the stock extension.
 
-**Page-bound areas → portable areas.**
-A vendor `ElementalArea` is wired toward a page owner. `EvoElementalArea` instead
-carries a polymorphic `ParentContainer`, so the same area model attaches equally to a
-page, a `SiteConfig`, a nested element, or an arbitrary DataObject — and the same
-mechanism is what makes areas inheritable and shareable.
+**Page-bound editing → areas, and their editing, on any object.**
+Upstream's areas extension can be applied beyond pages, but the element edit/link
+plumbing assumes a page: `getPage()` and `getAreaRelationName()` resolve through the
+owning page and fall back to a hardcoded `ElementalArea` relation, and element detail
+links are built through `CMSPageEditController`. So areas on `SiteConfig`, or elements
+edited in a `ModelAdmin` outside the pages section, still produce missing or wrong
+edit links in 6.2. `EvoElementalArea` carries a polymorphic `ParentContainer`, and
+elemental-base resolves `getCMSEditLink()` for `SiteConfig`, `ModelAdmin`-managed
+pages and arbitrary DataObject containers off the area's real relation name — so areas
+behave the same wherever they live, which is also what makes them inheritable and
+shareable.
 
-**`ElementVirtual` → element providers and area merge/replace.**
-Reusing a block in vendor elemental means `ElementVirtual`, which mirrors a single
-block by ID, in much the same spirit as core's `VirtualPage`. elemental-base takes a
-different route: an element can return a list of elements to render *in its place*
-(`provideElements()`), and an area can *merge* or *replace* its element list with
-another area's (`mergeWithArea()` / `replaceWithArea()`). Elements surfaced this way
-keep a reference back to their provider, so anchors, menu visibility and the like
-resolve against the right context.
+**Virtual-clone sharing → element providers.**
+Sharing a block upstream has meant the separate `silverstripe-elemental-virtual`
+module, which mirrors a block by ID much as core's `VirtualPage` mirrors a page. (Core
+Elemental ships no sharing mechanism of its own; recent 6.2 releases added cross-area
+element *moving*, which is a different concern.) elemental-base takes another route:
+an element can return a list of elements to render *in its place* (`provideElements()`),
+and an area can *merge* or *replace* its element list with another area's
+(`mergeWithArea()` / `replaceWithArea()`). Shared blocks stay real elements in their
+source area and keep a reference back to the element that surfaced them, so anchors,
+menu visibility and the like resolve against the right context.
 
-**`Title` + `ShowTitle` → `Title` and `Name`.**
-In vendor elemental a single `Title` doubles as the public heading and the CMS
+**`Title` doubling as a label → `Title` and `Name`.**
+Upstream still uses one `Title` field as both the public heading and the CMS
 identifier, gated by `ShowTitle`. elemental-base separates the two: `Title` is the
 optional front-end headline; `Name` is a CMS-only label so an editor can identify a
 block that has no public heading — without overloading `Title` to do it.
 
 **`element/$ID` → `area/{segment}/{id}` routing.**
-Vendor elements route beneath a single page-level handler. elemental-base routes
-elements per area (`area/{urlSegment}/{elementID}`), scoped to the areas present on
-the current request, with `handled_elemental_area_names` to opt areas in or out of
-routing. An element can therefore act as its own request handler.
+Upstream routes elements beneath a single page-level handler (`element/$ID`, still the
+shape in 6.2). elemental-base routes elements per area (`area/{urlSegment}/{elementID}`),
+scoped to the areas present on the current request, with `handled_elemental_area_names`
+to opt areas in or out of routing. An element can therefore act as its own request
+handler with enough context to resolve correctly even when nested or shared.
 
-**Coarse control → per-area element types, per-class permissions, publish-with-blocks.**
-elemental-base adds per-area allowed/disallowed element classes (with inheritance
+**Additions on top.**
+elemental-base also adds per-area allowed/disallowed element classes (with inheritance
 controls), per-element-class CRUD permission codes that cascade through area to
 container, and a "publish (including all blocks)" action that cascades a publish
 across every area a container owns.
@@ -106,10 +121,11 @@ across every area a container owns.
 ### Lineage
 
 elemental-base is the current form of a line of modules — among them
-`silverstripe-elemental-multiarea` and `silverstripe-elemental-inheritablearea` —
-that explored multi-area, inheritable and shared elemental content across several
-SilverStripe versions. It consolidates that work into a single base layer for
-SilverStripe 6.
+`silverstripe-elemental-multiarea` and `silverstripe-elemental-inheritablearea` — that
+explored multi-area, inheritable and shared elemental content across several
+SilverStripe versions. Some of what they originally set out to fix has since improved
+upstream; what elemental-base carries forward is the named-area contract and the
+editing, routing and inheritance behaviour built on top of it.
 
 ## Requirements
 

@@ -26,6 +26,12 @@ and adds.
 | 11 | [Publishing & versioning](11_publishing-and-versioning.md) | Publish-with-blocks, versioned areas, and duplication. |
 | 12 | [CMS & inline editing](12_cms-and-inline-editing.md) | The inline editor rework, tab provider, and block summaries. |
 
+## Reading path
+
+- **First implementation** — [Concepts](01_concepts.md) → [Areas & containers](02_areas-and-containers.md) → [Elements](04_elements.md) → [Templates & rendering](08_templates-and-rendering.md).
+- **Already using vendor Elemental** — start with [Concepts](01_concepts.md), then [Inheritance & sharing](05_inheritance-and-sharing.md), [Routing & controllers](07_routing-and-controllers.md), and [Publishing & versioning](11_publishing-and-versioning.md).
+- **Composition patterns** — [Nesting & hierarchy](06_nesting-and-hierarchy.md), [Inheritance & sharing](05_inheritance-and-sharing.md), and [Anchors & navigation](09_anchors-and-navigation.md).
+
 ## Conventions used in these docs
 
 - Examples use a generic `App\` namespace. Replace it with your own.

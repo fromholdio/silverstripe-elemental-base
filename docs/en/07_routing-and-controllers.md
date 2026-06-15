@@ -1,7 +1,7 @@
 # Routing & Controllers
 
-Vendor elemental routes every block beneath a single page-level handler. elemental-base
-replaces that with **area-scoped routing**: each element is addressable through the
+Vendor elemental routes every block beneath a single page-level handler (still the
+case in 6.2). elemental-base replaces that with **area-scoped routing**: each element is addressable through the
 area it belongs to, scoped to the areas present on the current request. The upshot is
 that an element can act as its own request handler — handling form posts, AJAX
 endpoints, or any action — at a stable, meaningful URL.
@@ -167,6 +167,12 @@ such elements can coexist on one page, each handling its own requests independen
 > **Redirects:** because element controllers render within a page template, returning
 > an `HTTPResponse` mid-render is not enough on its own. Set the redirect in `init()`
 > (or an action) and `EvoElementController::forTemplate()` will emit it correctly.
+
+## Migrating from vendor element routes
+
+If you are moving a project from stock Elemental, replace any hand-built `element/$ID`
+handler URLs with `$HandlerLink('action')` so the generated URL includes the area
+segment. Generate handler URLs at render time rather than storing them.
 
 ## Next
 

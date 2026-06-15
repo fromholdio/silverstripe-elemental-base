@@ -75,6 +75,32 @@ After duplication, elemental-base re-parents the cloned areas to the new contain
 (updating their `ParentContainer`) and publishes them, so the duplicate is immediately
 self-consistent rather than pointing back at the original's areas.
 
+## Deletion
+
+Add the local area relations to `$cascade_deletes` so an area is removed when its
+container is — otherwise deleting a container leaves orphaned area records behind:
+
+```php
+private static $cascade_deletes = [
+    'Content',
+    'Aside',
+];
+```
+
+Only cascade-delete relations the container genuinely owns. An area that is
+[inherited or shared](05_inheritance-and-sharing.md) belongs to another record (its
+local container), so it is cascade-deleted there — not from every container that merely
+renders it.
+
+## A note on ownership
+
+SilverStripe's `owns` config can also cascade a publish to related records, and you may
+use it where it suits your workflow. The publish-with-blocks action is the more explicit
+counterpart: it publishes the configured local areas directly, which stays predictable
+when areas are portable — an inherited or shared area should not be published as though
+it belonged to the page rendering it. Pick one approach per project and apply it
+consistently.
+
 ## Configuration
 
 | Config | Default | Effect |

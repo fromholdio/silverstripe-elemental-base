@@ -1,8 +1,9 @@
 # Areas & Containers
 
 A **container** is any DataObject that owns one or more elemental areas. This is the
-headline capability of elemental-base: instead of a single page-bound area, you
-declare as many named areas as you like, on any object, in configuration.
+headline capability of elemental-base: rather than areas discovered from `has_one`
+relations, you declare named areas with per-area configuration, on any object — and
+routing, templates, inheritance and CMS placement all key off those names.
 
 - [Making a container](#making-a-container)
 - [The `$elemental_areas` configuration](#the-elemental_areas-configuration)
@@ -64,8 +65,9 @@ most projects you set that on the area subclass instead.
 ## Area relations
 
 Each area name needs a matching `has_one` relation pointing at an
-[area class](03_area-types-and-allowed-elements.md). Add the relation to
-`$cascade_duplicates` so the area is cloned when the container is duplicated:
+[area class](03_area-types-and-allowed-elements.md). Add each relation to
+`$cascade_deletes` (so an area is removed with the container it belongs to) and
+`$cascade_duplicates` (so it is cloned when the container is duplicated):
 
 ```php
 use App\Elemental\Areas\ContentArea;
@@ -90,6 +92,11 @@ class Page extends SiteTree
     private static $has_one = [
         'Content' => ContentArea::class,
         'Aside' => AsideArea::class,
+    ];
+
+    private static $cascade_deletes = [
+        'Content',
+        'Aside',
     ];
 
     private static $cascade_duplicates = [
@@ -131,6 +138,19 @@ You never create area records by hand. The container does it:
 Each area is created as the class named in its `has_one` relation and is stamped with
 a polymorphic `ParentContainer` pointing back to the container. Area records are
 versioned and are published as they are created so the front end can resolve them.
+
+Because an area record only exists once its container does, a brand-new (unsaved)
+container has nowhere to attach blocks yet. If you build custom CMS fields for an area,
+guard for the unsaved case and prompt the editor to save first:
+
+```php
+if (!$this->isInDB()) {
+    return LiteralField::create(
+        'BlocksMessage',
+        '<p class="message">Blocks can be added once this record has been saved.</p>'
+    );
+}
+```
 
 ## CMS field placement
 
@@ -197,6 +217,16 @@ object can then be managed in a `ModelAdmin`, and its areas edit and route just 
 page's. (For the element edit links and "publish with blocks" action to resolve in a
 `ModelAdmin`, the managed object should expose a `CMSEditLink()` — see
 [Publishing & versioning](11_publishing-and-versioning.md).)
+
+## Adding a new area: checklist
+
+1. Add the `has_one` relation to your area class.
+2. Add the area name to `$elemental_areas`.
+3. Add the relation to `$cascade_deletes` and `$cascade_duplicates`.
+4. Set `enabled: true` and a `cms_fields` placement so editors see it.
+5. Add a `url_segment` if elements in the area need [routing](07_routing-and-controllers.md).
+6. Run `dev/build`.
+7. Test an existing record and a newly-created one, then publish (including blocks).
 
 ## Container API
 

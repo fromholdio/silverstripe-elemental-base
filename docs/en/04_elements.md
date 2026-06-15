@@ -57,7 +57,8 @@ anchors, menu visibility, the controller, inline editing, permissions — comes 
 ## Title vs Name
 
 This is the element-level equivalent of the multi-area decision: vendor elemental
-makes one `Title` field do two unrelated jobs, and elemental-base splits them.
+still makes one `Title` field do two unrelated jobs (the public heading and the CMS
+identifier, gated by `ShowTitle`), and elemental-base splits them.
 
 - **`Title`** is the **headline** — a public, front-end heading. It is *optional* and
   controlled by `is_title_enabled`. Its CMS label is "Headline".
@@ -162,8 +163,17 @@ $element->getShortClassName(true);// lowercased
 $element->getAnchor();            // resolved anchor for this block
 ```
 
-`isElementEmpty()` lets an element declare itself empty (via the `updateIsElementEmpty`
-hook); empty elements are skipped on the front end (their `canView()` returns `false`).
+Override `isElementEmpty()` to let an element declare itself empty; empty elements are
+skipped on the front end (their `canView()` returns `false` outside the CMS):
+
+```php
+public function isElementEmpty(): bool
+{
+    return trim((string) $this->Content) === '';
+}
+```
+
+(You can also influence it from an extension via the `updateIsElementEmpty` hook.)
 
 ## Applying the behaviour without EvoBaseElement
 

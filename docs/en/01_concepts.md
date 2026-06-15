@@ -77,9 +77,10 @@ back to the element that provided it (its **provider**), so context-sensitive
 behaviour — anchors, menu visibility — resolves against the provider rather than the
 shared element's own (out-of-context) configuration.
 
-This is elemental-base's answer to `ElementVirtual`: instead of mirroring one block by
-ID, you build an element that *sources* a set of blocks (for example, from a shared
-area on `SiteConfig`). See [Inheritance & sharing](05_inheritance-and-sharing.md).
+This is elemental-base's alternative to the virtual-clone approach (the separate
+`silverstripe-elemental-virtual` module): instead of mirroring one block by ID, you
+build an element that *sources* a set of blocks (for example, from a shared area on
+`SiteConfig`). See [Inheritance & sharing](05_inheritance-and-sharing.md).
 
 ## The configuration gate
 

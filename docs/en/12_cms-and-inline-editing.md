@@ -114,6 +114,15 @@ private static $scaffold_cms_fields_settings = [
 (The bundled `ElementContent` uses exactly this — it ignores `Content` in the scaffold
 and adds the editor field explicitly.)
 
+## Breadcrumbs
+
+Vendor Elemental's element breadcrumbs assume the element lives under a relation named
+`ElementalArea`. elemental-base replaces that: an element's CMS breadcrumb is labelled
+with its CMS title and block type (for example, `Our services (Content)`), and the area
+breadcrumb links back to whatever container actually owns the area. This keeps
+breadcrumbs correct when an area lives on `SiteConfig`, a `ModelAdmin`-managed
+DataObject, or a nested element rather than a page.
+
 ## What changed in the React editor
 
 elemental-base ships a small client bundle that registers replacements for two stock

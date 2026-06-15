@@ -7,7 +7,7 @@ you three composable mechanisms for reusing elemental content:
   else (a parent page, `SiteConfig`, anywhere).
 - **Merge / replace** — combine or substitute one area's elements with another's.
 - **Element providers** — have a single element expand into a list of elements
-  sourced elsewhere (the clean replacement for `ElementVirtual`).
+  sourced elsewhere (an alternative to virtual-clone records).
 
 - [Local vs current, in practice](#local-vs-current-in-practice)
 - [The `current` hook](#the-current-hook)
@@ -173,10 +173,25 @@ shared blocks — no mirroring, no duplicated records. Because each provided ele
 knows its provider, its anchor and menu-visibility resolve through the provider, which
 is why the shared element itself sets those flags off.
 
-> **Why this beats `ElementVirtual`:** there is no "virtual" record mirroring a single
-> block by ID. A provider is a normal element that *sources* a list however it likes —
-> from a shared area, a query, an external feed — and the rest of elemental-base treats
-> the provided blocks as first-class members of the area.
+If you would rather add provider behaviour to an existing element without subclassing
+it, use the `updateProvideElements` extension hook instead of overriding the method:
+
+```php
+public function updateProvideElements(?SS_List &$elements): void
+{
+    $shared = SiteConfig::current_site_config()->getElementalArea('SharedBlocks');
+    if ($shared) {
+        $elements = $shared->getElements();
+    }
+}
+```
+
+> **How this differs from a virtual-element clone:** there is no mirror record standing
+> in for a single block by ID (the approach taken by the separate
+> `silverstripe-elemental-virtual` module). A provider is a normal element that
+> *sources* a list however it likes — from a shared area, a query, an external feed —
+> and the rest of elemental-base treats the provided blocks as first-class members of
+> the area.
 
 ## Editing shared content
 
