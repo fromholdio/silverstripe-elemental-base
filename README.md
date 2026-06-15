@@ -1,6 +1,6 @@
 # silverstripe-elemental-base
 
-In an effort to begin compiling solid documentation for this module, I tasked GPT 5.5 and Claude Opus 4.8 to each generate detailed documentation. You can find those in the `/docs/` directory of the [`docs/codex`]([https://github.com/fromholdio/silverstripe-elemental-base/tree/docs/codex](https://github.com/fromholdio/silverstripe-elemental-base/blob/docs/codex/docs/en/00_index.md)) and [`docs/claude`](https://github.com/fromholdio/silverstripe-elemental-base/blob/docs/claude/docs/en/00_index.md) branches respectively.
+In an effort to begin compiling solid documentation for this module, I tasked GPT 5.5 and Claude Opus 4.8 to each generate detailed documentation. You can find those in the `/docs/` directory of the [`docs/codex`]([https://github.com/fromholdio/silverstripe-elemental-base/tree/docs/codex](https://github.com/fromholdio/silverstripe-elemental-base/blob/docs/codex/docs/en/00_index.md) and [`docs/claude`](https://github.com/fromholdio/silverstripe-elemental-base/blob/docs/claude/docs/en/00_index.md) branches respectively.
 
 There's much work I want to do on those docs, and much synthesising of what the LLMs generated, before I publish to a `/docs/` directory in `master`. But I'm satisfied with their accuracy, and if this module intrigues you then either or both of those branches will provide a great level of info in terms of architecture and implementation.
 
