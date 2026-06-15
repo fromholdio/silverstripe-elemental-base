@@ -113,6 +113,13 @@ let you override it:
 
 Reach for these when blocks are managed somewhere the default URL shape does not fit.
 
+Editing elements owned by a non-page `DataObject` in a `ModelAdmin` has been a
+long-standing upstream rough edge (tracked in issues such as
+[#718](https://github.com/silverstripe/silverstripe-elemental/issues/718) and
+[#871](https://github.com/silverstripe/silverstripe-elemental/issues/871)); recent
+Elemental has improved it, and these hooks give you the last bit of control when the
+default link still is not right.
+
 ## Scaffolding settings
 
 The inline form scaffolds fields from your element's `$db`/relations before your

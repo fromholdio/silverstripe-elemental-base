@@ -77,14 +77,16 @@ so an area is a first-class thing the rest of the system addresses — not a rel
 rediscovered at the edge of the stock extension.
 
 **Page-bound editing → areas, and their editing, on any object.**
-Upstream's areas extension can be applied beyond pages, but the element edit/link
-plumbing assumes a page: `getPage()` and `getAreaRelationName()` resolve through the
-owning page and fall back to a hardcoded `ElementalArea` relation, and element detail
-links are built through `CMSPageEditController`. So areas on `SiteConfig`, or elements
-edited in a `ModelAdmin` outside the pages section, still produce missing or wrong
-edit links in 6.2. `EvoElementalArea` carries a polymorphic `ParentContainer`, and
-elemental-base resolves `getCMSEditLink()` for `SiteConfig`, `ModelAdmin`-managed
-pages and arbitrary DataObject containers off the area's real relation name — so areas
+Upstream's areas extension can be applied beyond pages, and recent 6.2 releases improved
+support for non-page owners. But element edit links still hinge on the owner producing a
+usable link and the admin route cooperating: `getPage()` and `getAreaRelationName()`
+resolve through the owning page and fall back to a hardcoded `ElementalArea` relation,
+and page detail links are built through `CMSPageEditController`. So areas on `SiteConfig`,
+or elements edited in a `ModelAdmin` outside the pages section, remain a fiddly,
+long-standing rough edge. `EvoElementalArea` carries a polymorphic `ParentContainer`,
+and elemental-base resolves `getCMSEditLink()` for `SiteConfig`, `ModelAdmin`-managed
+pages and arbitrary DataObject containers off the area's real relation name — with
+`getElementCMSEditLink()` / `updateEvoCMSEditLink()` hooks to customise it — so areas
 behave the same wherever they live, which is also what makes them inheritable and
 shareable.
 
