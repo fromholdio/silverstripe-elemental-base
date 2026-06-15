@@ -113,8 +113,10 @@ $area->replaceWithArea($otherArea, true);      // override any previously-set re
 ```
 
 Internally an area builds its elements from its own `has_many`, unless a *replace*
-list is set (then it uses that), and then appends any *merge* list. You can also set
-the lists directly:
+list is set (then it uses that), and then appends any *merge* list. This is transient,
+request-local state on the area instance: it changes how the area assembles its list
+for the current render, and does not move elements between areas or write any
+relationship change. You can also set the lists directly:
 
 ```php
 $area->setMergeElements($list);

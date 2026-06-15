@@ -216,7 +216,10 @@ SilverStripe\SiteConfig\SiteConfig:
 object can then be managed in a `ModelAdmin`, and its areas edit and route just like a
 page's. (For the element edit links and "publish with blocks" action to resolve in a
 `ModelAdmin`, the managed object should expose a `CMSEditLink()` — see
-[Publishing & versioning](11_publishing-and-versioning.md).)
+[Publishing & versioning](11_publishing-and-versioning.md). If the default link shape
+is wrong for your CMS section, override it with the container's `getElementCMSEditLink()`
+method or the element's `updateEvoCMSEditLink` hook — see
+[CMS & inline editing](12_cms-and-inline-editing.md#customising-the-edit-link).)
 
 ## Adding a new area: checklist
 

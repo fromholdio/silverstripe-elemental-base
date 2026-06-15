@@ -99,6 +99,20 @@ The trailing text is configurable via `advanced_edit_instruction`. The link itse
 `SiteConfig`, on a `ModelAdmin`-managed object, or inside a nested area — which is what
 makes "jump to the full form" dependable across all the places a block can live.
 
+## Customising the edit link
+
+`getCMSEditLink()` resolves the common cases automatically, but a custom `ModelAdmin`
+or CMS section can need a different URL than the default page/gridfield shape. Two hooks
+let you override it:
+
+- **On the container** — implement
+  `getElementCMSEditLink($element, $area, $relationName, $container)` to return the exact
+  edit URL for the elements it owns.
+- **On the element** — add an extension with `updateEvoCMSEditLink(&$link)` to adjust the
+  resolved link.
+
+Reach for these when blocks are managed somewhere the default URL shape does not fit.
+
 ## Scaffolding settings
 
 The inline form scaffolds fields from your element's `$db`/relations before your
