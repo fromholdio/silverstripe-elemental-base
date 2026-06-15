@@ -53,8 +53,10 @@ graph TD
   resolve too.
 - The element's controller is returned to handle the rest of the request.
 
-The old vendor `element/$ID` route is explicitly disabled (it returns 404), as is
-vendor's content-controller extension — area-scoped routing replaces both.
+The old vendor `element/$ID` route is explicitly disabled (it returns 404), and
+vendor's `ElementalContentControllerExtension` is neutralised — it is mapped through
+`Injector` to a no-op extension (`fromholdio/silverstripe-empty-extension`), so it
+loads but does nothing. Area-scoped routing replaces both.
 
 ## EvoElementController
 

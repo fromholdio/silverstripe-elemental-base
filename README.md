@@ -118,6 +118,7 @@ SilverStripe 6.
 - dnadesign/silverstripe-elemental ^6.0.2
 - fromholdio/silverstripe-checkboxfieldgroup ^1.2.0
 - fromholdio/silverstripe-cms-fields-placement ^1.2.0
+- fromholdio/silverstripe-empty-extension ^1.2.0
 - lekoala/silverstripe-cms-actions ^2.0.0
 
 ## Installation
@@ -147,6 +148,10 @@ It raises its own `module_priority` above `dnadesign/silverstripe-elemental`, th
 | `ElementTabProvider` | `EvoElementTabProvider` |
 | `GridFieldDetailFormItemRequestExtension` | elemental-base's subclass |
 | `ElementalContentControllerExtension` | disabled (replaced by area-scoped routing) |
+
+That last row is how vendor's element routing is switched off: the extension is mapped
+to a no-op (`fromholdio/silverstripe-empty-extension`), so it still loads but does
+nothing, leaving elemental-base's `ElementsRouter` to handle element URLs.
 
 **Applies these extensions:**
 

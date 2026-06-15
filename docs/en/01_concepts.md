@@ -112,8 +112,9 @@ its behaviour two ways:
 - `EditFormFactory` → `EvoEditFormFactory`
 - `ElementTabProvider` → `EvoElementTabProvider`
 - `GridFieldDetailFormItemRequestExtension` → elemental-base's subclass
-- `ElementalContentControllerExtension` → disabled (its job is replaced by
-  area-scoped routing)
+- `ElementalContentControllerExtension` → mapped to a no-op extension
+  (`fromholdio/silverstripe-empty-extension`) so it loads but does nothing; its job is
+  replaced by [area-scoped routing](07_routing-and-controllers.md)
 
 **By applying extensions:**
 
