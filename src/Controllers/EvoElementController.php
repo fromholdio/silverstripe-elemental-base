@@ -50,8 +50,7 @@ class EvoElementController extends ElementController
     public function Link($action = null): ?string
     {
         $link = null;
-        $curr = Controller::curr();
-        if (!is_null($curr) && !is_a($curr, self::class, false)) {
+        if (Controller::has_curr() && ($curr = Controller::curr()) && !is_a($curr, self::class, false)) {
             $link = Controller::join_links(
                 $curr->Link($action),
                 '#' . $this->getElement()->getAnchor()
@@ -64,8 +63,7 @@ class EvoElementController extends ElementController
     public function AbsoluteLink($action = null): ?string
     {
         $link = null;
-        $curr = Controller::curr();
-        if (!is_null($curr) && !is_a($curr, self::class, false)) {
+        if (Controller::has_curr() && ($curr = Controller::curr()) && !is_a($curr, self::class, false)) {
             $link = Controller::join_links(
                 $curr->AbsoluteLink($action),
                 '#' . $this->getElement()->getAnchor()
