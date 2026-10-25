@@ -90,8 +90,7 @@ class BaseElementExtension extends DataExtension
 
     public function Title(): ?string
     {
-        $curr = Controller::curr();
-        return !is_null($curr) && is_a($curr, GraphQLController::class, false)
+        return Controller::has_curr() && ($curr = Controller::curr()) && is_a($curr, GraphQLController::class, false)
             ? $this->getOwner()->getInlineCMSTitle()
             : $this->getOwner()->getLocalTitle();
     }
@@ -778,8 +777,8 @@ class BaseElementExtension extends DataExtension
 
     public function isCMSFormInline(): bool
     {
-        $curr = Controller::curr();
-        return !is_null($curr)
+        return Controller::has_curr()
+            && ($curr = Controller::curr())
             && is_a($curr, ElementalAreaController::class);
     }
 
@@ -1153,9 +1152,12 @@ class BaseElementExtension extends DataExtension
 
     public function isAdminCurrController(): bool
     {
-        $curr = Controller::curr();
-        return is_a($curr, LeftAndMain::class, false)
-            || is_a($curr, GraphQLController::class, false);
+        return Controller::has_curr()
+            && ($curr = Controller::curr())
+            && (
+                is_a($curr, LeftAndMain::class, false)
+                || is_a($curr, GraphQLController::class, false)
+            );
     }
 
     public function isBaseElement(): bool
